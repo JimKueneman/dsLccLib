@@ -11,9 +11,19 @@
 #include "openlcb_defines.h"
 #include "buffers.h"
 #include "mcu_drv.h"
+#include "stdio.h"  // printf
 
 
-uint8_t print_msg = TRUE;
+uint8_t print_msg = FALSE;
+
+void PrintAliasAndNodeID(uint16_t alias, uint64_t node_id) {
+    
+    printf("Alias: %04X\n", alias);
+    printf("NodeID: %04X", (uint16_t) (node_id >> 32));
+    printf("%04X", (uint16_t) (node_id >> 16));
+    printf("%04X\n\n", (uint16_t) (node_id >> 0));
+    
+}
 
 
 void PrintContentsFIFO(openlcb_msg_buffer_t* fifo) {

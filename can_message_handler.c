@@ -255,6 +255,36 @@ void HandleIncomingLegacySNIP(openlcb_msg_buffer_t* buffer_ptr, uint16_t source_
 
 }
 
+void TestForAliasConflict(ecan_msg_t* msg, uint32_t can_control_msg, uint8_t add_payload_node_id) {
+
+    ecan_msg_t out_msg;
+
+    for (int iIndex = 0; iIndex < LEN_NODE_ARRAY; iIndex++) {
+
+        if (nodes.node[iIndex].state.permitted) {
+
+            printf("node: %d\n", iIndex);
+
+            if ((nodes.node[iIndex].alias == (msg->identifier & 0xFFF))) { // Check if we own this Alias
+
+                printf("Found\n");
+                if (add_payload_node_id)
+                    CopyNodeIDToCANBuffer(&out_msg, nodes.node[iIndex].id);
+                else
+                    out_msg.payload_size = 0;
+
+                out_msg.identifier = RESERVED_TOP_BIT | can_control_msg | nodes.node[iIndex].alias;
+                Send_Raw_CAN_Message(TX_CHANNEL_OPENLCB_MSG, &out_msg, TRUE);
+
+                break;
+
+            }
+
+        }
+    }
+
+}
+
 // Handled from within a CAN Rx Interrupt
 //
 
@@ -272,23 +302,13 @@ void HandleIncoming_CAN_Control_Frame(ecan_msg_t* msg) {
         switch (msg->identifier & MASK_CAN_FRAME_SEQUENCE_NUMBER) {
 
             case CAN_CONTROL_FRAME_CID7:
-
-                // First chance to reply that the Alias is taken
-
-                break;
             case CAN_CONTROL_FRAME_CID6:
-
-                // Second chance to reply that the Alias is taken
-
-                break;
             case CAN_CONTROL_FRAME_CID5:
-
-                // Third chance to reply that the Alias is taken
-
-                break;
             case CAN_CONTROL_FRAME_CID4:
 
-                // Last chance to reply that the Alias is taken             
+                printf("CID\n");
+
+                TestForAliasConflict(msg, CAN_CONTROL_FRAME_RID, FALSE);
 
                 break;
             case CAN_CONTROL_FRAME_CID3:
@@ -308,6 +328,7 @@ void HandleIncoming_CAN_Control_Frame(ecan_msg_t* msg) {
 
             case CAN_CONTROL_FRAME_RID: // Reserve ID
 
+
                 // Node has come on line and is taking this Node ID and Alias
                 // Check and make sure it is not a duplicate Node ID and if so we need to follow 6.2.5 in the CAN Transport Spec
 
@@ -318,15 +339,16 @@ void HandleIncoming_CAN_Control_Frame(ecan_msg_t* msg) {
                 // Check and make sure it is not a duplicate Node ID and if so we need to follow 6.2.5 in the CAN Transport Spec
 
                 printf("AMD\n");
-                
+
+                TestForAliasConflict(msg, CAN_CONTROL_FRAME_AMR, TRUE);
+
                 break;
             case CAN_CONTROL_FRAME_AME:
 
-                printf("AME\n");
                 // Someone is requesting we reply with Alias Mapping Definitions for our Node(s)
 
                 for (int iIndex = 0; iIndex < LEN_NODE_ARRAY; iIndex++) {
-                    
+
                     if (nodes.node[iIndex].state.permitted) {
 
                         if ((msg->payload_size == 0) || (CAN_PayloadToNodeID(&msg->payload) == nodes.node[iIndex].id)) {
@@ -345,7 +367,7 @@ void HandleIncoming_CAN_Control_Frame(ecan_msg_t* msg) {
                 // The Alias and Node ID passed are not longer associated and the Alias is effectively "released" and can be reused
 
                 printf("AMr\n");
-                
+
                 break;
             case CAN_CONTROL_FRAME_ERROR_INFO_REPORT_0:
                 // Advanced feature for gateways/routers/etc.

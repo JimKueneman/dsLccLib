@@ -51,17 +51,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=main.c traps.c debug.c mcu_drv.c buffers.c main_statemachine.c node.c can_message_handler.c openlcb_utilities.c
+SOURCEFILES_QUOTED_IF_SPACED=main.c traps.c debug.c mcu_drv.c buffers.c main_statemachine.c node.c can_message_handler.c openlcb_utilities.c callbacks.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/traps.o ${OBJECTDIR}/debug.o ${OBJECTDIR}/mcu_drv.o ${OBJECTDIR}/buffers.o ${OBJECTDIR}/main_statemachine.o ${OBJECTDIR}/node.o ${OBJECTDIR}/can_message_handler.o ${OBJECTDIR}/openlcb_utilities.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/traps.o.d ${OBJECTDIR}/debug.o.d ${OBJECTDIR}/mcu_drv.o.d ${OBJECTDIR}/buffers.o.d ${OBJECTDIR}/main_statemachine.o.d ${OBJECTDIR}/node.o.d ${OBJECTDIR}/can_message_handler.o.d ${OBJECTDIR}/openlcb_utilities.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/traps.o ${OBJECTDIR}/debug.o ${OBJECTDIR}/mcu_drv.o ${OBJECTDIR}/buffers.o ${OBJECTDIR}/main_statemachine.o ${OBJECTDIR}/node.o ${OBJECTDIR}/can_message_handler.o ${OBJECTDIR}/openlcb_utilities.o ${OBJECTDIR}/callbacks.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/traps.o.d ${OBJECTDIR}/debug.o.d ${OBJECTDIR}/mcu_drv.o.d ${OBJECTDIR}/buffers.o.d ${OBJECTDIR}/main_statemachine.o.d ${OBJECTDIR}/node.o.d ${OBJECTDIR}/can_message_handler.o.d ${OBJECTDIR}/openlcb_utilities.o.d ${OBJECTDIR}/callbacks.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/traps.o ${OBJECTDIR}/debug.o ${OBJECTDIR}/mcu_drv.o ${OBJECTDIR}/buffers.o ${OBJECTDIR}/main_statemachine.o ${OBJECTDIR}/node.o ${OBJECTDIR}/can_message_handler.o ${OBJECTDIR}/openlcb_utilities.o
+OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/traps.o ${OBJECTDIR}/debug.o ${OBJECTDIR}/mcu_drv.o ${OBJECTDIR}/buffers.o ${OBJECTDIR}/main_statemachine.o ${OBJECTDIR}/node.o ${OBJECTDIR}/can_message_handler.o ${OBJECTDIR}/openlcb_utilities.o ${OBJECTDIR}/callbacks.o
 
 # Source Files
-SOURCEFILES=main.c traps.c debug.c mcu_drv.c buffers.c main_statemachine.c node.c can_message_handler.c openlcb_utilities.c
+SOURCEFILES=main.c traps.c debug.c mcu_drv.c buffers.c main_statemachine.c node.c can_message_handler.c openlcb_utilities.c callbacks.c
 
 
 
@@ -143,6 +143,12 @@ ${OBJECTDIR}/openlcb_utilities.o: openlcb_utilities.c  .generated_files/flags/de
 	@${RM} ${OBJECTDIR}/openlcb_utilities.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  openlcb_utilities.c  -o ${OBJECTDIR}/openlcb_utilities.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/openlcb_utilities.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
 	
+${OBJECTDIR}/callbacks.o: callbacks.c  .generated_files/flags/default/58eddb393cf2eb2c426c5198f42d809f14a161e2 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/callbacks.o.d 
+	@${RM} ${OBJECTDIR}/callbacks.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  callbacks.c  -o ${OBJECTDIR}/callbacks.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/callbacks.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
+	
 else
 ${OBJECTDIR}/main.o: main.c  .generated_files/flags/default/8a25b9a1787497316f108428b031bf19a63ad6a .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
@@ -197,6 +203,12 @@ ${OBJECTDIR}/openlcb_utilities.o: openlcb_utilities.c  .generated_files/flags/de
 	@${RM} ${OBJECTDIR}/openlcb_utilities.o.d 
 	@${RM} ${OBJECTDIR}/openlcb_utilities.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  openlcb_utilities.c  -o ${OBJECTDIR}/openlcb_utilities.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/openlcb_utilities.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
+	
+${OBJECTDIR}/callbacks.o: callbacks.c  .generated_files/flags/default/f3172be90b6c9c1f7eb2ff3d7afcdee86a7d356 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/callbacks.o.d 
+	@${RM} ${OBJECTDIR}/callbacks.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  callbacks.c  -o ${OBJECTDIR}/callbacks.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/callbacks.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
 	
 endif
 

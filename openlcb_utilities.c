@@ -9,6 +9,7 @@
 #include "xc.h"
 #include "buffers.h"
 #include "openlcb_defines.h"
+#include "debug.h"
 
 void CopyNodeIDToMessage(openlcb_msg_t* msg, uint64_t node_id) {
 
@@ -37,48 +38,24 @@ void CopyNodeIDToCANBuffer(ecan_msg_t* buffer, uint64_t node_id) {
 }
 
 uint64_t MessageDataToNodeID(openlcb_msg_t* msg) {
-
-    uint64_t result = 0;
-
-    if ((msg->state.data_struct_size == ID_DATA_SIZE_BASIC) && (msg->payload_count == 6)) {
-
-        uint64_t x = ((uint64_t) ((*(payload_basic_t*) msg->payload_ptr)[0]));
-        result = result | x << 40;
-        x = ((uint64_t) ((*(payload_basic_t*) msg->payload_ptr)[1]));
-        result = result | x << 32;
-        x = ((uint64_t) ((*(payload_basic_t*) msg->payload_ptr)[2]));
-        result = result | x << 24;
-        x = ((uint64_t) ((*(payload_basic_t*) msg->payload_ptr)[3]));
-        result = result | x << 16;
-        x = ((uint64_t) ((*(payload_basic_t*) msg->payload_ptr)[4]));
-        result = result | x << 8;
-        x = ((uint64_t) ((*(payload_basic_t*) msg->payload_ptr)[5]));
-        result = result | x;
-
-    }
-
-    return result;
+    
+    return ((uint64_t) ((*(payload_basic_t*) msg->payload_ptr)[0]) << 40) | 
+           ((uint64_t) ((*(payload_basic_t*) msg->payload_ptr)[1]) << 32) | 
+           ((uint64_t) ((*(payload_basic_t*) msg->payload_ptr)[2]) << 24) | 
+           ((uint64_t) ((*(payload_basic_t*) msg->payload_ptr)[3]) << 16) | 
+           ((uint64_t) ((*(payload_basic_t*) msg->payload_ptr)[4]) << 8)  |
+           ((uint64_t) ((*(payload_basic_t*) msg->payload_ptr)[5]));
 
 }
 
 uint64_t CAN_PayloadToNodeID(payload_bytes_can_t* payload) {
 
-    uint64_t result = 0;
-
-    uint64_t x = (uint64_t) (*payload)[0];
-    result = result | x << 40;
-    x = (uint64_t) (*payload)[1];
-    result = result | x << 32;
-    x = (uint64_t) (*payload)[2];
-    result = result | x << 24;
-    x = (uint64_t) (*payload)[3];
-    result = result | x << 16;
-    x = (uint64_t) (*payload)[4];
-    result = result | x << 8;
-    x = (uint64_t) (*payload)[5];
-    result = result | x;
-
-    return result;
+    return ((uint64_t) (*payload)[0] << 40) | 
+           ((uint64_t) (*payload)[1] << 32) | 
+           ((uint64_t) (*payload)[2] << 24) | 
+           ((uint64_t) (*payload)[3] << 16) | 
+           ((uint64_t) (*payload)[4] << 8)  |
+           ((uint64_t) (*payload)[5]);
 
 }
 

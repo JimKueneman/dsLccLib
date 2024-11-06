@@ -13,6 +13,7 @@
       <itemPath>can_message_handler.h</itemPath>
       <itemPath>node_definition.h</itemPath>
       <itemPath>openlcb_utilities.h</itemPath>
+      <itemPath>callbacks.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -36,6 +37,7 @@
       <itemPath>node.c</itemPath>
       <itemPath>can_message_handler.c</itemPath>
       <itemPath>openlcb_utilities.c</itemPath>
+      <itemPath>callbacks.c</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>

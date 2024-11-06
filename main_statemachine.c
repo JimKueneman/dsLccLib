@@ -15,6 +15,7 @@
 #include "buffers.h"
 #include "node_definition.h"
 #include "openlcb_utilities.h"
+#include "callbacks.h"
 #include "stdio.h"  // printf
 
 void InitializeStateMachine(void) {
@@ -236,6 +237,9 @@ void RunMainStateMachine(openlcb_msg_t* dispatched_msg) {
             case RUNSTATE_GENERATE_ALIAS:
 
                 nextnode->alias = GenerateAlias(nextnode->seed);
+               if (AliasChangeCallbackFunc) 
+                    AliasChangeCallbackFunc(nextnode->alias, nextnode->id);
+                
                 nextnode->state.run = RUNSTATE_SEND_CHECK_ID_07;
 
                 break;

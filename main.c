@@ -54,6 +54,7 @@
 #include "debug.h"
 #include "node.h"
 #include "openlcb_utilities.h"
+#include "callbacks.h"
 
 /*
  * Function:        void ClearIntrflags(void)
@@ -165,6 +166,11 @@ void TestBuffers(uint8_t debug) {
 
 }
 
+void AliasAllocated(uint16_t alias, uint64_t node_id) {
+
+    PrintAliasAndNodeID(alias, node_id);
+}
+
 //#define DEBUG
 
 int main(void) {
@@ -185,25 +191,21 @@ int main(void) {
 
     TRISAbits.TRISA1 = 0;
 
-    printf("Booted\n");
-
-    printf("Wow\n");
-
-#ifndef DEBUG
-
-    TestBuffers(FALSE);
-
-#endif
     // */ 
 
     _TRISB4 = 0; // Output
     _RB4 = 0;
 
-    AllocateNode(0xAA0203040506);
- //     AllocateNode(0xBB0203040506);
- //     AllocateNode(0xCC0203040506);
-  //     AllocateNode(0xDD0203040506);
-  //     AllocateNode(0xFF0203040506);
+    openlcb_node_t* node = AllocateNode(0xAA0203040506);
+
+    //     AllocateNode(0xBB0203040506);
+    //     AllocateNode(0xCC0203040506);
+    //     AllocateNode(0xDD0203040506);
+    //     AllocateNode(0xFF0203040506);
+
+    AliasChangeCallbackFunc = &AliasAllocated;
+
+
 
     while (1) {
 
