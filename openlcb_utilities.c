@@ -7,9 +7,10 @@
 
 
 #include "xc.h"
-#include "buffers.h"
+#include "openlcb_buffers.h"
 #include "openlcb_defines.h"
 #include "debug.h"
+#include "can_statemachine.h"
 
 void CopyNodeIDToMessage(openlcb_msg_t* msg, uint64_t node_id) {
 
@@ -26,7 +27,7 @@ void CopyNodeIDToMessage(openlcb_msg_t* msg, uint64_t node_id) {
 
 }
 
-void CopyNodeIDToCANBuffer(ecan_msg_t* buffer, uint64_t node_id) {
+void CopyNodeIDToCANBuffer(can_msg_t* buffer, uint64_t node_id) {
 
     buffer->payload_size = 6;
 

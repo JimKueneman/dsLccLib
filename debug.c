@@ -9,8 +9,8 @@
 #include "xc.h"
 #include "stdio.h"
 #include "openlcb_defines.h"
-#include "buffers.h"
-#include "mcu_drv.h"
+#include "openlcb_buffers.h"
+#include "mcu_driver.h"
 #include "stdio.h"  // printf
 
 
@@ -72,13 +72,28 @@ uint16_t CountFIFO(openlcb_msg_buffer_t* fifo) {
 void PrintBufferStats() {
           
     printf("OpenLcb Msg Pool: %d\n", pool_openlcb_msg_allocated);
-    printf("OpenLcb Msg Pool Max Depth: %d\n", max_pool_openlcb_msg_allocated);
-    printf("dsPIC CAN FIFO Buffer Max Depth: %d\n", max_can_fifo_depth);
+    printf("OpenLcb Msg Pool Max Depth: %d\n\n", max_pool_openlcb_msg_allocated);
+    
+    printf("CAN Msg Pool: %d\n", pool_can_msg_allocated);
+    printf("CAN Msg Pool Max Depth: %d\n\n", max_pool_can_msg_allocated);
+    
+    
+    printf("dsPIC CAN FIFO Buffer Max Depth: %d\n\n", max_can_fifo_depth);
+    
    
     printf("Incoming Msg FIFO: %d\n", CountFIFO(&incoming_openlcb_msg_fifo));
-    printf("Outgoing Msg FIFO: %d\n", CountFIFO(&outgoing_openlcb_msg_fifo));
-    printf("Incoming Msg Inprocess FIFO: %d\n", CountFIFO(&incoming_openlcb_inprocess_msg_list));
-    printf("Outgoing Msg Inprocess FIFO: %d\n", CountFIFO(&outgoing_openlcb_inprocess_msg_list));
+    printf("Outgoing Msg FIFO: %d\n\n", CountFIFO(&outgoing_openlcb_msg_fifo));
+    
+    uint16_t count = 0;
+    for (int iIndex = 0; iIndex < LEN_OPENLCB_MSG_INPROCESS_BUFFER; iIndex++) {
+        if (incoming_openlcb_inprocess_msg_list.list[iIndex]) 
+            count = count + 1;
+      
+    printf("Incoming Inprocess Msg Buffer: %d\n\n", count);
+    
+    }
+    
+  //  printf("Incoming Msg In-process FIFO: %d\n", CountFIFO(&incoming_openlcb_inprocess_msg_list));
     
 };
 

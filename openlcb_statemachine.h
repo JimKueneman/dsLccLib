@@ -33,7 +33,7 @@
 
 #include <xc.h> // include processor files - each processor file is guarded.  
 #include "node.h"
-#include "buffers.h"
+#include "openlcb_buffers.h"
 
 // General boot initialization
 #define RUNSTATE_INIT                             0
@@ -65,7 +65,7 @@
 
 
 
-extern void InitializeStateMachine(void);
+extern void Initialize_OpenLcb_StateMachine(void);
 
 extern void RunMainStateMachine(openlcb_msg_t* dispatched_msg);
 

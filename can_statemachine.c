@@ -8,15 +8,16 @@
 
 
 #include "xc.h"
-#include "buffers.h"
-#include "mcu_drv.h"
+#include "openlcb_buffers.h"
+#include "mcu_driver.h"
 #include "openlcb_defines.h"
 #include "debug.h"
-#include "buffers.h"
-#include "can_message_handler.h"
+#include "openlcb_buffers.h"
+#include "can_statemachine.h"
 #include "stdio.h" // printf
 #include "node.h" 
 #include "openlcb_utilities.h"
+#include "can_buffers.h"
 
 
 #define STORAGE_PUSH 0  // Treat the list like a FIFO
@@ -25,11 +26,12 @@
 #define APPEND_TRUE  TRUE
 #define APPEND_FALSE FALSE
 
-void Initialize_CAN_MessageHandler() {
+void Initialize_CAN_StateMachine() {
+
 
 }
 
-uint8_t CopyData_CAN_Buffer_To_OpenLcbMsg(openlcb_msg_t* openlcb_msg_ptr, ecan_msg_t* ecan_msg_ptr, uint8_t start_index, uint8_t append) {
+uint8_t CopyData_CAN_Buffer_To_OpenLcbMsg(openlcb_msg_t* openlcb_msg_ptr, can_msg_t* ecan_msg_ptr, uint8_t start_index, uint8_t append) {
 
     uint8_t result = 0;
 
@@ -51,7 +53,7 @@ uint8_t CopyData_CAN_Buffer_To_OpenLcbMsg(openlcb_msg_t* openlcb_msg_ptr, ecan_m
 
                     if (iMsgPayload < LEN_DATA_BASIC) {
 
-                        (*((payload_basic_ptr) openlcb_msg_ptr->payload_ptr)) [iMsgPayload] = ecan_msg_ptr->payload[iCAN_Payload];
+                        (*((payload_basic_t*) openlcb_msg_ptr->payload_ptr)) [iMsgPayload] = ecan_msg_ptr->payload[iCAN_Payload];
                         openlcb_msg_ptr->payload_count = openlcb_msg_ptr->payload_count + 1;
                     };
 
@@ -60,7 +62,7 @@ uint8_t CopyData_CAN_Buffer_To_OpenLcbMsg(openlcb_msg_t* openlcb_msg_ptr, ecan_m
 
                     if (iMsgPayload < LEN_DATA_DATAGRAM) {
 
-                        (*((payload_datagram_ptr) openlcb_msg_ptr->payload_ptr))[iMsgPayload] = ecan_msg_ptr->payload[iCAN_Payload];
+                        (*((payload_datagram_t*) openlcb_msg_ptr->payload_ptr))[iMsgPayload] = ecan_msg_ptr->payload[iCAN_Payload];
                         openlcb_msg_ptr->payload_count = openlcb_msg_ptr->payload_count + 1;
                     }
 
@@ -69,7 +71,7 @@ uint8_t CopyData_CAN_Buffer_To_OpenLcbMsg(openlcb_msg_t* openlcb_msg_ptr, ecan_m
 
                     if (iMsgPayload < LEN_DATA_STREAM_SNIP) {
 
-                        (*((payload_stream_snip_ptr) openlcb_msg_ptr->payload_ptr))[iMsgPayload] = ecan_msg_ptr->payload[iCAN_Payload];
+                        (*((payload_stream_snip_t*) openlcb_msg_ptr->payload_ptr))[iMsgPayload] = ecan_msg_ptr->payload[iCAN_Payload];
                         openlcb_msg_ptr->payload_count = openlcb_msg_ptr->payload_count + 1;
                     }
 
@@ -85,40 +87,70 @@ uint8_t CopyData_CAN_Buffer_To_OpenLcbMsg(openlcb_msg_t* openlcb_msg_ptr, ecan_m
     };
 
     return result;
-};
+}
 
-openlcb_msg_t* AllocateAndStoreToList(openlcb_msg_buffer_t* list_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t can_mti, ecan_msg_t* ecan_msg, uint8_t payload_start, uint8_t data_size, uint8_t storage_type) {
+uint8_t Send_Raw_CAN_Message(uint8_t tx_channel, can_msg_t* msg, uint8_t block) {
+
+    if (block) {
+        can_send_timeout = 0;
+        while (!Ecan1TxBufferClear(tx_channel)) {
+
+            if (can_send_timeout >= 1500) {
+                Ecan1TxBufferSetTransmit(tx_channel, FALSE);
+                can_send_timeout = 0;
+                break;
+
+            }
+
+        };
+
+        Ecan1WriteTxMsgBufId(tx_channel, msg->identifier, TRUE, FALSE);
+        Ecan1WriteTxMsgBufData(tx_channel, msg->payload_size, &msg->payload);
+        Ecan1TxBufferSetTransmit(tx_channel, TRUE);
+
+        return TRUE;
+
+    } else {
+
+        if (Ecan1TxBufferClear(tx_channel)) {
+
+            Ecan1WriteTxMsgBufId(tx_channel, msg->identifier, TRUE, FALSE);
+            Ecan1WriteTxMsgBufData(tx_channel, msg->payload_size, &msg->payload);
+            Ecan1TxBufferSetTransmit(tx_channel, TRUE);
+
+            return TRUE;
+        }
+
+    }
+
+    return FALSE;
+
+}
+
+openlcb_msg_t* AllocateAndStoreToFIFO(openlcb_msg_buffer_t* list_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t can_mti, can_msg_t* ecan_msg, uint8_t payload_start, uint8_t data_size) {
 
     openlcb_msg_t* result = Allocate_OpenLcb_Msg(source_alias, source_id, dest_alias, dest_id, can_mti, data_size, FALSE);
 
     if (result) {
 
-        switch (storage_type) {
+        result = Push_OpenLcb_Message(list_ptr, result, FALSE);
 
-            case STORAGE_PUSH:
+        if (result)
+            
+            CopyData_CAN_Buffer_To_OpenLcbMsg(result, ecan_msg, payload_start, APPEND_FALSE);
+        
+        else {
 
-                result = Push_OpenLcb_Message(list_ptr, result, FALSE);
+            // TODO: Send Error 
 
-                break;
-
-            case STORAGE_INSERT:
-
-                result = Insert_OpenLcb_Message(list_ptr, result, FALSE);
-
-                break;
+            printf("  fail store: AllocateAndStoreToFIFO\n");
         }
-
-    };
-
-    if (result) {
-
-        CopyData_CAN_Buffer_To_OpenLcbMsg(result, ecan_msg, payload_start, APPEND_FALSE);
 
     } else {
 
         // TODO: Send Error 
 
-        printf("  fail allocate and store: allocate\n");
+        printf("  fail allocate: AllocateAndStoreToFIFO\n");
 
     }
 
@@ -126,13 +158,45 @@ openlcb_msg_t* AllocateAndStoreToList(openlcb_msg_buffer_t* list_ptr, uint16_t s
 
 };
 
-openlcb_msg_t* HandleIncomingCAN_FirstFrame(openlcb_msg_buffer_t* buffer_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, ecan_msg_t* ecan_msg, uint8_t payload_start, uint8_t data_size) {
+openlcb_msg_t* AllocateAndStoreToBuffer(inprocess_buffer_t* list_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t can_mti, can_msg_t* ecan_msg, uint8_t payload_start, uint8_t data_size) {
+
+    openlcb_msg_t* result = Allocate_OpenLcb_Msg(source_alias, source_id, dest_alias, dest_id, can_mti, data_size, FALSE);
+
+    if (result) {
+
+        result = Insert_OpenLcb_Message(list_ptr, result, FALSE);
+
+        if (result)
+            
+            CopyData_CAN_Buffer_To_OpenLcbMsg(result, ecan_msg, payload_start, APPEND_FALSE);
+        
+        else {
+
+            // TODO: Send Error 
+
+            printf("  fail store: AllocateAndStoreToFIFO\n");
+        }
+
+    } else {
+
+        // TODO: Send Error 
+
+        printf("  fail allocate: AllocateAndStoreToFIFO\n");
+
+    }
+
+    return result;
+
+};
+
+
+openlcb_msg_t* HandleIncomingCAN_FirstFrame(inprocess_buffer_t* buffer_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, can_msg_t* ecan_msg, uint8_t payload_start, uint8_t data_size) {
 
     openlcb_msg_t* result = Find_OpenLcb_Message_As_Buffer(buffer_ptr, source_alias, source_id, dest_alias, dest_id, mti, FALSE, FALSE);
 
     if (!result) {
 
-        result = AllocateAndStoreToList(buffer_ptr, source_alias, source_id, dest_alias, dest_id, mti, ecan_msg, payload_start, data_size, STORAGE_INSERT);
+        result = AllocateAndStoreToBuffer(buffer_ptr, source_alias, source_id, dest_alias, dest_id, mti, ecan_msg, payload_start, data_size);
 
         if (!result) {
 
@@ -156,7 +220,7 @@ openlcb_msg_t* HandleIncomingCAN_FirstFrame(openlcb_msg_buffer_t* buffer_ptr, ui
 
 }
 
-openlcb_msg_t* HandleIncomingCAN_MiddleFrame(openlcb_msg_buffer_t* buffer_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, ecan_msg_t* ecan_msg, uint8_t payload_start) {
+openlcb_msg_t* HandleIncomingCAN_MiddleFrame(inprocess_buffer_t* buffer_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, can_msg_t* ecan_msg, uint8_t payload_start) {
 
     openlcb_msg_t* result = Find_OpenLcb_Message_As_Buffer(buffer_ptr, source_alias, source_id, dest_alias, dest_id, mti, FALSE, FALSE);
 
@@ -175,7 +239,7 @@ openlcb_msg_t* HandleIncomingCAN_MiddleFrame(openlcb_msg_buffer_t* buffer_ptr, u
 
 }
 
-openlcb_msg_t* HandleIncomingCAN_LastFrame(openlcb_msg_buffer_t* buffer_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, ecan_msg_t* ecan_msg, uint8_t payload_start) {
+openlcb_msg_t* HandleIncomingCAN_LastFrame(inprocess_buffer_t* buffer_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, can_msg_t* ecan_msg, uint8_t payload_start) {
 
     openlcb_msg_t* result = Find_OpenLcb_Message_As_Buffer(buffer_ptr, source_alias, source_id, dest_alias, dest_id, mti, FALSE, TRUE);
 
@@ -205,7 +269,7 @@ openlcb_msg_t* HandleIncomingCAN_LastFrame(openlcb_msg_buffer_t* buffer_ptr, uin
 
 }
 
-void HandleIncomingLegacySNIP(openlcb_msg_buffer_t* buffer_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, ecan_msg_t* ecan_msg) {
+void HandleIncomingLegacySNIP(inprocess_buffer_t* buffer_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, can_msg_t* ecan_msg) {
 
     // Early implementations did not have the multi-frame bits to use... special case
 
@@ -226,7 +290,7 @@ void HandleIncomingLegacySNIP(openlcb_msg_buffer_t* buffer_ptr, uint16_t source_
 
         for (int i = 0; i < openlcb_msg_inprocess->payload_count; i++) {
 
-            if ((*((payload_stream_snip_ptr) openlcb_msg_inprocess->payload_ptr))[i] == 0x00) {
+            if ((*((payload_stream_snip_t*) openlcb_msg_inprocess->payload_ptr))[i] == 0x00) {
 
                 null_count = null_count + 1;
 
@@ -255,9 +319,9 @@ void HandleIncomingLegacySNIP(openlcb_msg_buffer_t* buffer_ptr, uint16_t source_
 
 }
 
-void TestForAliasConflict(ecan_msg_t* msg, uint32_t can_control_msg, uint8_t add_payload_node_id) {
+void TestForAliasConflict(can_msg_t* msg, uint32_t can_control_msg, uint8_t add_payload_node_id) {
 
-    ecan_msg_t out_msg;
+    can_msg_t out_msg;
 
     for (int iIndex = 0; iIndex < LEN_NODE_ARRAY; iIndex++) {
 
@@ -274,7 +338,8 @@ void TestForAliasConflict(ecan_msg_t* msg, uint32_t can_control_msg, uint8_t add
                     out_msg.payload_size = 0;
 
                 out_msg.identifier = RESERVED_TOP_BIT | can_control_msg | nodes.node[iIndex].alias;
-                Send_Raw_CAN_Message(TX_CHANNEL_OPENLCB_MSG, &out_msg, TRUE);
+
+                Push_CAN_Message(&out_msg, TRUE);
 
                 break;
 
@@ -288,9 +353,9 @@ void TestForAliasConflict(ecan_msg_t* msg, uint32_t can_control_msg, uint8_t add
 // Handled from within a CAN Rx Interrupt
 //
 
-void HandleIncoming_CAN_Control_Frame(ecan_msg_t* msg) {
+void HandleIncoming_CAN_Control_Frame(can_msg_t* msg) {
 
-    ecan_msg_t out_msg;
+    can_msg_t out_msg;
 
     if (msg->identifier & MASK_CAN_FRAME_SEQUENCE_NUMBER) {
 
@@ -355,7 +420,8 @@ void HandleIncoming_CAN_Control_Frame(ecan_msg_t* msg) {
 
                             CopyNodeIDToCANBuffer(&out_msg, nodes.node[iIndex].id);
                             out_msg.identifier = RESERVED_TOP_BIT | CAN_CONTROL_FRAME_AMD | nodes.node[iIndex].alias;
-                            Send_Raw_CAN_Message(TX_CHANNEL_OPENLCB_MSG, &out_msg, TRUE);
+
+                            Push_CAN_Message(&out_msg, TRUE);
 
                         }
                     }
@@ -388,7 +454,7 @@ void HandleIncoming_CAN_Control_Frame(ecan_msg_t* msg) {
 
 }
 
-void HandleIncomingCAN_Msg(ecan_msg_t* msg) {
+void Statemachine_Incoming_CAN(can_msg_t* msg) {
 
     uint16_t source_alias = msg->identifier & 0x00000FFF;
     uint16_t dest_alias = (msg->identifier & 0x00FFF000) >> 12; // Make this assumption up front.  Correct for Datagrams (steams?)
@@ -420,7 +486,7 @@ void HandleIncomingCAN_Msg(ecan_msg_t* msg) {
 
                             else
 
-                                AllocateAndStoreToList(&incoming_openlcb_msg_fifo, source_alias, 0, dest_alias, 0, can_mti, msg, 0, ID_DATA_SIZE_BASIC, STORAGE_PUSH);
+                                AllocateAndStoreToFIFO(&incoming_openlcb_msg_fifo, source_alias, 0, dest_alias, 0, can_mti, msg, 0, ID_DATA_SIZE_BASIC);
 
                             break;
 
@@ -446,14 +512,14 @@ void HandleIncomingCAN_Msg(ecan_msg_t* msg) {
                     }
                 } else { // No Destination Address
 
-                    AllocateAndStoreToList(&incoming_openlcb_msg_fifo, source_alias, 0, dest_alias, 0, can_mti, msg, 0, ID_DATA_SIZE_BASIC, STORAGE_PUSH);
+                    AllocateAndStoreToFIFO(&incoming_openlcb_msg_fifo, source_alias, 0, dest_alias, 0, can_mti, msg, 0, ID_DATA_SIZE_BASIC);
 
                 };
 
                 break;
             case CAN_FRAME_TYPE_DATAGRAM_ONLY:
 
-                AllocateAndStoreToList(&incoming_openlcb_msg_fifo, source_alias, 0, dest_alias, 0, MTI_DATAGRAM, msg, 0, ID_DATA_SIZE_BASIC, STORAGE_PUSH);
+                AllocateAndStoreToFIFO(&incoming_openlcb_msg_fifo, source_alias, 0, dest_alias, 0, MTI_DATAGRAM, msg, 0, ID_DATA_SIZE_BASIC);
                 break;
 
             case CAN_FRAME_TYPE_DATAGRAM_FIRST:
@@ -488,43 +554,8 @@ void HandleIncomingCAN_Msg(ecan_msg_t* msg) {
 
 };
 
-uint8_t Send_Raw_CAN_Message(uint8_t tx_channel, ecan_msg_t* msg, uint8_t block) {
 
-    if (block) {
-        can_send_timeout = 0;
-        while (!Ecan1TxBufferClear(tx_channel)) {
 
-            if (can_send_timeout >= 1500) {
-                Ecan1TxBufferSetTransmit(tx_channel, FALSE);
-                can_send_timeout = 0;
-                break;
-
-            }
-
-        };
-
-        Ecan1WriteTxMsgBufId(tx_channel, msg->identifier, TRUE, FALSE);
-        Ecan1WriteTxMsgBufData(tx_channel, msg->payload_size, &msg->payload);
-        Ecan1TxBufferSetTransmit(tx_channel, TRUE);
-
-        return TRUE;
-
-    } else {
-
-        if (Ecan1TxBufferClear(tx_channel)) {
-
-            Ecan1WriteTxMsgBufId(tx_channel, msg->identifier, TRUE, FALSE);
-            Ecan1WriteTxMsgBufData(tx_channel, msg->payload_size, &msg->payload);
-            Ecan1TxBufferSetTransmit(tx_channel, TRUE);
-
-            return TRUE;
-        }
-
-    }
-
-    return FALSE;
-
-}
 
 openlcb_msg_t* outgoing_msg = (void*) 0;
 uint16_t outgoing_msg_index;
@@ -552,7 +583,7 @@ uint8_t LoadOutgoing_CAN_Buffer(openlcb_msg_t* msg) {
         last_frame = FALSE;
 
         // Kick it off.
-        HandleOutgoingCAN_Msg(FALSE);
+        Statemachine_Outgoing_CAN(FALSE);
 
         result = TRUE;
 
@@ -564,7 +595,7 @@ uint8_t LoadOutgoing_CAN_Buffer(openlcb_msg_t* msg) {
 
 // CAN TX Interrupt will call this if it is a multi-frame message to keep it pumping..
 
-uint8_t HandleOutgoingCAN_Msg(uint8_t called_from_interrupt) {
+uint8_t Statemachine_Outgoing_CAN(uint8_t called_from_interrupt) {
 
     uint8_t result = FALSE;
 

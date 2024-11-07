@@ -28,46 +28,68 @@
 
 // This is a guard condition so that contents of this file are not included
 // more than once.  
-#ifndef __OPENLCB_UTILITIES__
-#define	__OPENLCB_UTILITIES__
+#ifndef __CAN_BUFFERS__
+#define	__CAN_BUFFERS__
 
-#include <xc.h> // include processor files - each processor file is guarded. 
-#include "openlcb_buffers.h"
+#include <xc.h> // include processor files - each processor file is guarded.  
 
-extern void CopyNodeIDToMessage(openlcb_msg_t* msg, uint64_t node_id); 
-extern void CopyNodeIDToCANBuffer(can_msg_t* buffer, uint64_t node_id);
-extern uint64_t MessageDataToNodeID(openlcb_msg_t* msg);
-extern uint8_t EqualBuffers(openlcb_msg_t* msg1, openlcb_msg_t* msg2);
-extern uint64_t CAN_PayloadToNodeID(payload_bytes_can_t* payload);
-extern void CAN_CopyBuffers(uint8_t start, uint8_t count, payload_bytes_can_t* payload_source, payload_bytes_can_t* payload_target);
+#define LEN_CAN_PAYLOAD_DATA   8
 
-// TODO Insert appropriate #include <>
+#define TX_CHANNEL_CAN_CONTROL 0
+#define TX_CHANNEL_OPENLCB_MSG 1
 
-// TODO Insert C++ class definitions if appropriate
+#define LEN_OUTGOING_CAN_BUFFER 20   
 
-// TODO Insert declarations
+// Structure for a basic CAN payload
+typedef uint8_t payload_bytes_can_t[LEN_CAN_PAYLOAD_DATA];
 
-// Comment a function and leverage automatic documentation with slash star star
-/**
-    <p><b>Function prototype:</b></p>
-  
-    <p><b>Summary:</b></p>
 
-    <p><b>Description:</b></p>
+typedef struct {
+    uint32_t identifier; // CAN 29 bit identifier (extended)
+    uint8_t payload_size;  // How many bytes are valid
+    payload_bytes_can_t payload;    // Payload bytes
+} can_msg_t;
 
-    <p><b>Precondition:</b></p>
+typedef struct {
+   can_msg_t list[LEN_OUTGOING_CAN_BUFFER];
+   uint8_t head;
+   uint8_t tail;
+} can_fifo_t;
 
-    <p><b>Parameters:</b></p>
 
-    <p><b>Returns:</b></p>
+extern can_fifo_t outgoing_can_fifo;
 
-    <p><b>Example:</b></p>
-    <code>
- 
-    </code>
 
-    <p><b>Remarks:</b></p>
+extern uint16_t pool_can_msg_allocated;
+extern uint16_t max_pool_can_msg_allocated;
+
+extern void Initialize_CAN_Buffers();
+
+/*
+ * Puts the passed message on the passed FIFO stack
+ *     [IN] fifo: the FIFO to operate on
+ *     [IN] openlcb_msg: The message to push on the FIFO stack
+ *     [IN] disable_interrupts: used to disable the CAN interrupts for resource locking (mutex)
+ * 
+ * Returns the message passed if it was placed on the FIFO; NULL if there was no space
  */
+extern uint8_t Push_CAN_Message(can_msg_t* msg, uint8_t disable_interrupts);
+
+
+/*
+ * Pulls the first in message on the passed FIFO stack, the msg is removed from the stack
+ *     [IN] fifo: the FIFO to operate on
+ *     [IN] disable_interrupts: used to disable the CAN interrupts for resource locking (mutex)
+ * 
+ * Returns: TRUE or FALSE
+ */
+extern uint8_t Pop_CAN_Message(can_msg_t* msg, uint8_t disable_interrupts);
+
+
+extern uint8_t Is_CAN_FIFO_Empty(uint8_t disable_interrupts);
+
+
+
 // TODO Insert declarations or function prototypes (right here) to leverage 
 // live documentation
 

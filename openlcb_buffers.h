@@ -37,7 +37,6 @@
 
 ///////////////////////////// 10/28/2024
 
-#define DATA_SIZE_CAN          8
 
 #define LEN_DATA_BASIC       16     // most are 8 bytes but a few protocols take 2 frames like Traction
 #define LEN_DATA_DATAGRAM    72
@@ -50,10 +49,13 @@
 #define ID_DATA_SIZE_STREAM_SNIP 0x02    // b10
 #define ID_DATA_SIZE_RESERVED    0x03    // b11
 
-#define LEN_DATA_SIZE_BASIC_POOL       50  // USER DEFINED
-#define LEN_DATA_SIZE_DATAGRAM_POOL    10  // USER DEFINED
-#define LEN_DATA_SIZE_STREAM_SNIP_POOL 2  // USER DEFINED
+
+#define LEN_DATA_SIZE_BASIC_POOL          50  // USER DEFINED
+#define LEN_DATA_SIZE_DATAGRAM_POOL       10  // USER DEFINED
+#define LEN_DATA_SIZE_STREAM_SNIP_POOL     2  // USER DEFINED
 #define LEN_OPENLCB_MSG_POOL    LEN_DATA_SIZE_BASIC_POOL+LEN_DATA_SIZE_DATAGRAM_POOL+LEN_DATA_SIZE_STREAM_SNIP_POOL  
+
+#define LEN_OPENLCB_MSG_INPROCESS_BUFFER  50  // USER DEFINED
 
 #define LEN_OPENLCB_MSG_FIFO  LEN_OPENLCB_MSG_POOL
 
@@ -62,24 +64,6 @@
 typedef uint8_t payload_basic_t[LEN_DATA_BASIC];
 typedef uint8_t payload_datagram_t[LEN_DATA_DATAGRAM];
 typedef uint8_t payload_stream_snip_t[LEN_DATA_STREAM_SNIP];
-
-typedef payload_basic_t* payload_basic_ptr;
-typedef payload_datagram_t* payload_datagram_ptr;
-typedef payload_stream_snip_t* payload_stream_snip_ptr;
-
-
-// Structure for a basic CAN payload
-typedef uint8_t payload_bytes_can_t[DATA_SIZE_CAN];
-
-
-// ******************************************
-// Structure used to pull the CAN identifier and data bytes out of the chips CAN module
-// ******************************************
-typedef struct {
-    uint32_t identifier; // CAN 29 bit identifier (extended)
-    uint8_t payload_size;  // How many bytes are valid
-    payload_bytes_can_t payload;    // Payload bytes
-} ecan_msg_t;
 
 
 // ******************************************
@@ -90,8 +74,6 @@ typedef struct {
     uint8_t data_struct_size:2;        // defines what type the data_struct is; ID_DATA_SIZE_BASIC, ID_DATA_SIZE_DATAGRAM, ID_DATA_SIZE_STREAM_SNIP
     uint8_t allocated:1;               // message has been allocated and is in use
     uint8_t valid:1;                   // message is complete and ready to be dispatched
-    uint8_t dest_alias_valid:1;        // message has a valid destination alias (short cut for MIT bit) 
-    uint8_t inprocess_can_transfer:1;  // message is in the middle of sending multiple frames of CAN messages, tag will hold the current index of bytes sent
 } openlcb_msg_state;
 
 typedef struct {
@@ -102,8 +84,7 @@ typedef struct {
     uint64_t source_id;
     uint64_t dest_id;
     uint16_t payload_count;
-    uint16_t tag;                 // user defined field
-    void* payload_ptr;       // depending on state.data_struct_size will be payload_basic_ptr, payload_datagram_ptr or payload_stream_snip_ptr;
+    void* payload_ptr;       // depending on state.data_struct_size will be payload_basic_t*, payload_datagram_t* or payload_stream_snip_t*;
 } openlcb_msg_t;
 
 // Array of all the openlcb message structures
@@ -120,11 +101,8 @@ typedef struct {
 } openlcb_msg_buffer_t;
 
 typedef struct {
-    uint16_t source_alias;
-    uint64_t source_id;
-    uint16_t dest_alias;
-    uint64_t dest_id;
-} msg_node_info_t;
+    openlcb_msg_t* list[LEN_OPENLCB_MSG_INPROCESS_BUFFER];
+} inprocess_buffer_t;
 
 // buffer for complete OpenLCB messages ready to dispatch to internal nodes
 extern openlcb_msg_buffer_t incoming_openlcb_msg_fifo;
@@ -132,9 +110,7 @@ extern openlcb_msg_buffer_t incoming_openlcb_msg_fifo;
 extern openlcb_msg_buffer_t outgoing_openlcb_msg_fifo;
 
 // buffer for multiframe incoming messages to be assembled and eventually moved to the incoming_openlcb_msg_fifo sructure (or deleted if abandon/error) 
-extern openlcb_msg_buffer_t incoming_openlcb_inprocess_msg_list;
-// buffer for multiframe outgoing messages to be disassembled and set out as multiframe messages
-extern openlcb_msg_buffer_t outgoing_openlcb_inprocess_msg_list;
+extern inprocess_buffer_t incoming_openlcb_inprocess_msg_list;
 
 
 extern uint16_t pool_openlcb_msg_allocated;
@@ -147,7 +123,7 @@ extern uint16_t max_pool_openlcb_msg_allocated;
  *   Returns: nothing
  * Call at the beginning of program execution to set the buffers to a known state
  */
-extern void InitializeBuffers();
+extern void Initialize_OpenLcb_Buffers();
 
 
 // ****************  FUNCTIONS TO TREAT THE PASSED BUFFER AS A FIFO ****************
@@ -160,7 +136,7 @@ extern void InitializeBuffers();
  * 
  * Returns the message passed if it was placed on the FIFO; NULL if there was no space
  */
-extern openlcb_msg_t* Push_OpenLcb_Message(openlcb_msg_buffer_t* fifo_ptr, openlcb_msg_t* openlcb_msg, uint8_t disable_interrupts);
+extern openlcb_msg_t* Push_OpenLcb_Message(openlcb_msg_buffer_t* fifo_ptr, openlcb_msg_t* msg, uint8_t disable_interrupts);
 
 
 /*
@@ -173,34 +149,10 @@ extern openlcb_msg_t* Push_OpenLcb_Message(openlcb_msg_buffer_t* fifo_ptr, openl
 extern openlcb_msg_t* Pop_OpenLcb_Message(openlcb_msg_buffer_t* fifo_ptr, uint8_t disable_interrupts);
 
 
-extern uint8_t Is_FIFO_Empty(openlcb_msg_buffer_t* fifo_ptr, uint8_t disable_interrupts);
-/*
- * Pulls the first in message on the passed FIFO stack, the message is not removed from the stack
- *     [IN] fifo: the FIFO to operate on
- *     [IN] disable_interrupts: used to disable the CAN interrupts for resource locking (mutex)
- * 
- * Returns: message that is next in line to be popped
- */
-extern openlcb_msg_t* Peek_OpenLcb_Message(openlcb_msg_buffer_t* fifo_ptr, uint8_t disable_interrupts);
-
-/*   Find_OpenLcb_Message_As_FIFO(openlcb_msg_buffer_t* fifo_ptr, uint16_t source_alias, uint16_t dest_alias, uint16_t mti, uint8_t disable_interrupts);
- * 
- *   Treat the passed buffer as a FIFO so only searches between Head and Tail
- * 
- *   [IN] source_alias: 12 bit alias the message came from
- *   [IN] dest_alias:   12 bit alias the message came from (0 if not used)
- *   [IN] mti         : OpenLCB MTI (this is NOT a 12 bit CAN MTI)
- *   [IN] disable_interrupts: used to disable the CAN interrupts for resource locking (mutex)
- * 
- *   Returns: pointer to an openlcb_msg structure with matches to the passed alias(s) and mti; returns null if could not be found
- */
-extern openlcb_msg_t* Find_OpenLcb_Message_As_FIFO(openlcb_msg_buffer_t* fifo_ptr, uint16_t source_alias, uint16_t dest_alias, uint16_t mti, uint8_t disable_interrupts);
-
+extern uint8_t Is_OpenLcb_FIFO_Empty(openlcb_msg_buffer_t* fifo_ptr, uint8_t disable_interrupts);
 
 
 // ***  FUNCTIONS TO TREAT THE PASSED BUFFER AS A LIST OF MESSAGE POINTERS  ****
-
-
 /*   
  *   Treat the passed buffer as a List so insert the passed message into the first open (non NULL) slot
  * 
@@ -210,8 +162,7 @@ extern openlcb_msg_t* Find_OpenLcb_Message_As_FIFO(openlcb_msg_buffer_t* fifo_pt
  * 
  *   Returns: passed message if successful, NULL if buffer was full 
  */
-extern openlcb_msg_t* Insert_OpenLcb_Message(openlcb_msg_buffer_t* buffer_ptr, openlcb_msg_t* openlcb_msg_ptr, uint8_t disable_interrupts);
-
+extern openlcb_msg_t* Insert_OpenLcb_Message(inprocess_buffer_t* buffer_ptr, openlcb_msg_t* openlcb_msg_ptr, uint8_t disable_interrupts);
 
 /*   
  *   Treat the passed buffer as a List so search all entries that are not NULL
@@ -224,7 +175,7 @@ extern openlcb_msg_t* Insert_OpenLcb_Message(openlcb_msg_buffer_t* buffer_ptr, o
  * 
  *   Returns: pointer to an message with matches to the passed alias(s) and mti; returns null if could not be found
  */
-extern openlcb_msg_t* Find_OpenLcb_Message_As_Buffer(openlcb_msg_buffer_t* buffer_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, uint8_t disable_interrupts, uint8_t remove);
+extern openlcb_msg_t* Find_OpenLcb_Message_As_Buffer(inprocess_buffer_t* buffer_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, uint8_t disable_interrupts, uint8_t remove);
 
 /*
  *   [IN] source_alias: 12 bit alias the message came from

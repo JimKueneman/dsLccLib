@@ -1,8 +1,13 @@
 build/default/production/openlcb_utilities.o: openlcb_utilities.c \
- buffers.h openlcb_defines.h debug.h
+ openlcb_buffers.h openlcb_defines.h debug.h can_statemachine.h \
+ can_buffers.h
 
-buffers.h:
+openlcb_buffers.h:
 
 openlcb_defines.h:
 
 debug.h:
+
+can_statemachine.h:
+
+can_buffers.h:

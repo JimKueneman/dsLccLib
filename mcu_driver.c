@@ -12,11 +12,11 @@
 
 #include "xc.h"
 #include <libpic30.h>
-#include "mcu_drv.h"
+#include "mcu_driver.h"
 #include "debug.h"
 #include "openlcb_defines.h"
-#include "can_message_handler.h"
-#include "buffers.h"
+#include "can_statemachine.h"
+#include "openlcb_buffers.h"
 #include "node.h"
 
 // printf
@@ -225,9 +225,9 @@ void __attribute__((interrupt(no_auto_psv))) _U1RXInterrupt(void) {
         printf("flushing: outgoing_openlcb_msg_fifo\n");
         ForceFlushAndFreeFIFO(&outgoing_openlcb_msg_fifo);
         printf("flushing: incoming_openlcb_inprocess_msg_list\n");
-        ForceFlushAndFreeFIFO(&incoming_openlcb_inprocess_msg_list);
-        printf("flushing: outgoing_openlcb_inprocess_msg_list\n");
-        ForceFlushAndFreeFIFO(&outgoing_openlcb_inprocess_msg_list);
+//        ForceFlushAndFreeFIFO(&incoming_openlcb_inprocess_msg_list);
+ //       printf("flushing: outgoing_openlcb_inprocess_msg_list\n");
+ //       ForceFlushAndFreeFIFO(&outgoing_openlcb_inprocess_msg_list);
     } else
         if ((rxdata == 'F') | (rxdata == 'f')) {
         printf("incoming:\n");
@@ -236,9 +236,9 @@ void __attribute__((interrupt(no_auto_psv))) _U1RXInterrupt(void) {
         PrintContentsFIFO(&outgoing_openlcb_msg_fifo);
 
         printf("incoming in-process:\n");
-        PrintContentsFIFO(&incoming_openlcb_inprocess_msg_list);
+  //      PrintContentsFIFO(&incoming_openlcb_inprocess_msg_list);
         printf("outgoing in-process:\n");
-        PrintContentsFIFO(&outgoing_openlcb_inprocess_msg_list);
+  //      PrintContentsFIFO(&outgoing_openlcb_inprocess_msg_list);
     } else
         if ((rxdata == 'H') | (rxdata == 'h')) {
         printf("T: Forces a CAN Transmit with a made up message\n");
@@ -279,7 +279,7 @@ void __attribute__((interrupt(no_auto_psv))) _C1Interrupt(void) {
 
         uint8_t fifo_size = 0;
         uint16_t ide = 0;
-        ecan_msg_t ecan_msg;
+        can_msg_t ecan_msg;
 
         while (buffer_tail != buffer_head) {
 
@@ -287,7 +287,7 @@ void __attribute__((interrupt(no_auto_psv))) _C1Interrupt(void) {
             Ecan1ReadRxMsgBufData(buffer_tail, &ecan_msg);
 
             if (ide)
-                HandleIncomingCAN_Msg(&ecan_msg);
+                Statemachine_Incoming_CAN(&ecan_msg);
 
             // Clear Full/OV flags on any bit that is set, there is a race condition for this.  See the errata
             // You can only clear (set a 0) to the flags so if we write a 1 it won't do anything
@@ -314,7 +314,7 @@ void __attribute__((interrupt(no_auto_psv))) _C1Interrupt(void) {
     } else { // TX Interrupt
         if (C1INTFbits.TBIF) {
 
-            HandleOutgoingCAN_Msg(TRUE);
+            Statemachine_Outgoing_CAN(TRUE);
 
             C1INTFbits.TBIF = 0;
 
@@ -957,7 +957,7 @@ void Ecan1WriteTxMsgBufDataByte(uint16_t buf, uint16_t data_length, uint16_t dat
  * *rxData: [OUT] A pointer to the Data payload for the CAN message
  * *ide:    [OUT} A pointer to a boolean that indicates if the message is extended or not
  */
-void Ecan1ReadRxMsgBufId(uint16_t buf, ecan_msg_t *rxData, uint16_t *ide) {
+void Ecan1ReadRxMsgBufId(uint16_t buf, can_msg_t *rxData, uint16_t *ide) {
 
     uint32_t sid, eid_17_6, eid_5_0;
 
@@ -986,7 +986,7 @@ void Ecan1ReadRxMsgBufId(uint16_t buf, ecan_msg_t *rxData, uint16_t *ide) {
  * buf:     [IN] The buffer index to read
  * *rxData: [OUT] A pointer to the Data payload for the CAN message
  */
-void Ecan1ReadRxMsgBufData(uint16_t buf, ecan_msg_t *rxData) {
+void Ecan1ReadRxMsgBufData(uint16_t buf, can_msg_t *rxData) {
 
     rxData->payload_size = ecan1msgBuf[buf][2] & 0x000F;
 

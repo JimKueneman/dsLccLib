@@ -12,7 +12,8 @@
 #define	__MCU_DRV__
 
 #include <xc.h> // include processor files - each processor file is guarded. 
-#include "buffers.h"
+#include "openlcb_buffers.h"
+#include "can_statemachine.h"
 
 
 // Timer -----------------------------------------------------------------------
@@ -44,8 +45,8 @@ extern void Ecan1WriteTxMsgBufId(uint16_t buf, int32_t txIdentifier, uint16_t id
 extern void Ecan1WriteTxMsgBufData(uint16_t buf, uint16_t dataLength, payload_bytes_can_t* data);
 extern void Ecan1WriteTxMsgBufDataWord(uint16_t buf, uint16_t data_length, uint16_t data1, uint16_t data2, uint16_t data3, uint16_t data4);
 extern void Ecan1WriteTxMsgBufDataByte(uint16_t buf, uint16_t data_length, uint16_t data1, uint16_t data2, uint16_t data3, uint16_t data4, uint16_t data5, uint16_t data6, uint16_t data7, uint16_t data8);
-extern void Ecan1ReadRxMsgBufId(uint16_t buf, ecan_msg_t *rxData, uint16_t *ide);
-extern void Ecan1ReadRxMsgBufData(uint16_t buf, ecan_msg_t *rxData);
+extern void Ecan1ReadRxMsgBufId(uint16_t buf, can_msg_t *rxData, uint16_t *ide);
+extern void Ecan1ReadRxMsgBufData(uint16_t buf, can_msg_t *rxData);
 
 
 // How full the chips CAN fifo has gotten

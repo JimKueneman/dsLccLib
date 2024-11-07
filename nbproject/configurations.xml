@@ -6,14 +6,15 @@
                    projectFiles="true">
       <itemPath>debug.h</itemPath>
       <itemPath>openlcb_defines.h</itemPath>
-      <itemPath>mcu_drv.h</itemPath>
-      <itemPath>buffers.h</itemPath>
-      <itemPath>main_statemachine.h</itemPath>
       <itemPath>node.h</itemPath>
-      <itemPath>can_message_handler.h</itemPath>
       <itemPath>node_definition.h</itemPath>
       <itemPath>openlcb_utilities.h</itemPath>
       <itemPath>callbacks.h</itemPath>
+      <itemPath>openlcb_buffers.h</itemPath>
+      <itemPath>openlcb_statemachine.h</itemPath>
+      <itemPath>mcu_driver.h</itemPath>
+      <itemPath>can_statemachine.h</itemPath>
+      <itemPath>can_buffers.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -31,13 +32,14 @@
       <itemPath>main.c</itemPath>
       <itemPath>traps.c</itemPath>
       <itemPath>debug.c</itemPath>
-      <itemPath>mcu_drv.c</itemPath>
-      <itemPath>buffers.c</itemPath>
-      <itemPath>main_statemachine.c</itemPath>
       <itemPath>node.c</itemPath>
-      <itemPath>can_message_handler.c</itemPath>
       <itemPath>openlcb_utilities.c</itemPath>
       <itemPath>callbacks.c</itemPath>
+      <itemPath>openlcb_buffers.c</itemPath>
+      <itemPath>openlcb_statemachine.c</itemPath>
+      <itemPath>mcu_driver.c</itemPath>
+      <itemPath>can_statemachine.c</itemPath>
+      <itemPath>can_buffers.c</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>

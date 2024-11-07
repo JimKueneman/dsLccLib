@@ -9,13 +9,13 @@
 #include "xc.h"
 #include "node.h"
 #include "openlcb_defines.h"
-#include "main_statemachine.h"
-#include "mcu_drv.h"
+#include "openlcb_statemachine.h"
+#include "mcu_driver.h"
 
 openlcb_nodes_t nodes;
 uint16_t can_send_timeout;
 
-void InitializeNode() {
+void Initialize_Node() {
 
     nodes.active.index = 0;
 

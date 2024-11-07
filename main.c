@@ -46,11 +46,11 @@
 
 #include "xc.h"
 
-#include "mcu_drv.h"
+#include "mcu_driver.h"
 #include "stdio.h"
-#include "buffers.h"
+#include "openlcb_buffers.h"
 #include "openlcb_defines.h"
-#include "main_statemachine.h"
+#include "openlcb_statemachine.h"
 #include "debug.h"
 #include "node.h"
 #include "openlcb_utilities.h"
@@ -117,56 +117,7 @@ void HandleUART(void) {
     return;
 }
 
-void TestBuffers(uint8_t debug) {
-
-    InitializeBuffers();
-
-
-    openlcb_msg_t* msg0 = Allocate_OpenLcb_Msg(0x123, 0x00, 0x00, 0x000, MTI_VERIFY_NODE_ID_ADDRESSED, ID_DATA_SIZE_BASIC, FALSE);
-    Push_OpenLcb_Message(&outgoing_openlcb_msg_fifo, msg0, FALSE);
-
-    openlcb_msg_t* msg1 = Allocate_OpenLcb_Msg(0x456, 0x010203040506, 0x987, 0x060504030201, MTI_OPTIONAL_INTERACTION_REJECTED, ID_DATA_SIZE_DATAGRAM, FALSE);
-    Push_OpenLcb_Message(&outgoing_openlcb_msg_fifo, msg1, FALSE);
-
-    openlcb_msg_t* msg2 = Allocate_OpenLcb_Msg(0x789, 0x010203040506, 0x172, 0x060504030201, MTI_CONSUMER_IDENTIFY, ID_DATA_SIZE_STREAM_SNIP, FALSE);
-
-
-    Push_OpenLcb_Message(&outgoing_openlcb_msg_fifo, msg2, FALSE);
-
-    openlcb_msg_t* msg3 = Find_OpenLcb_Message_As_FIFO(&outgoing_openlcb_msg_fifo, 0x789, 0x172, MTI_CONSUMER_IDENTIFY, FALSE);
-    if (msg3) {
-        if (debug) {
-            msg3 = msg0;
-        } else {
-            printf("found message msg3\n");
-        }
-    };
-
-    openlcb_msg_t* msg4 = Find_OpenLcb_Message_As_FIFO(&outgoing_openlcb_msg_fifo, 0x123, 0, MTI_VERIFY_NODE_ID_ADDRESSED, FALSE);
-    if (msg4) {
-        if (debug) {
-            msg4 = msg0;
-        } else {
-            printf("found message msg4\n");
-        }
-
-    };
-
-
-    PrintBufferStats();
-
-    openlcb_msg_t* popped_msg = Pop_OpenLcb_Message(&outgoing_openlcb_msg_fifo, FALSE);
-
-    while (popped_msg) {
-        Release_OpenLcb_Msg(popped_msg, FALSE);
-        popped_msg = Pop_OpenLcb_Message(&outgoing_openlcb_msg_fifo, FALSE);
-    };
-
-    PrintBufferStats();
-
-}
-
-void AliasAllocated(uint16_t alias, uint64_t node_id) {
+void AliasAllocatedCallback(uint16_t alias, uint64_t node_id) {
 
     PrintAliasAndNodeID(alias, node_id);
 }
@@ -177,17 +128,42 @@ int main(void) {
 
     openlcb_msg_t* dispatched_msg;
 
-#ifdef DEBUG 
-
-    TestBuffers(TRUE);
-
-#endif
-
     ClearIntrflags();
-    InitializeBuffers();
+    
+    Initialize_OpenLcb_Buffers(); 
+    Initialize_OpenLcb_StateMachine();
+    
+    Initialize_CAN_Buffers();
+    Initialize_CAN_StateMachine();
+    
+#ifdef DEBUG
+    
+    can_msg_t msg;
+    
+    msg.identifier = 0x19AAAFFF;
+    msg.payload_size = 4;
+    msg.payload[0] = 0xAA;
+    msg.payload[1] = 0xBB;
+    msg.payload[2] = 0xCC;
+    msg.payload[3] = 0xDD;
+    
+    Push_CAN_Message(&msg, FALSE);
+    
+    msg.identifier = 0;
+    msg.payload_size = 0;
+    msg.payload[0] = 0;
+    msg.payload[0] = 0;
+    msg.payload[0] = 0;
+    msg.payload[0] = 0;
+    
+    Pop_CAN_Message(&msg, FALSE);
+    
+#endif
+    
+    
+    
     Initialize_MCU_Drv();
-    InitializeStateMachine();
-    InitializeNode();
+    Initialize_Node();
 
     TRISAbits.TRISA1 = 0;
 
@@ -203,7 +179,7 @@ int main(void) {
     //     AllocateNode(0xDD0203040506);
     //     AllocateNode(0xFF0203040506);
 
-    AliasChangeCallbackFunc = &AliasAllocated;
+    AliasChangeCallbackFunc = &AliasAllocatedCallback;
 
 
 
@@ -234,13 +210,13 @@ int main(void) {
 
                     switch (dispatched_msg->state.data_struct_size) {
                         case ID_DATA_SIZE_BASIC:
-                            printf("0x%02x ", (*((payload_basic_ptr) dispatched_msg->payload_ptr))[i]);
+                            printf("0x%02x ", (*((payload_basic_t*) dispatched_msg->payload_ptr))[i]);
                             break;
                         case ID_DATA_SIZE_DATAGRAM:
-                            printf("0x%02x ", (*((payload_datagram_ptr) dispatched_msg->payload_ptr))[i]);
+                            printf("0x%02x ", (*((payload_datagram_t*) dispatched_msg->payload_ptr))[i]);
                             break;
                         case ID_DATA_SIZE_STREAM_SNIP:
-                            printf("0x%02x ", (*((payload_stream_snip_ptr) dispatched_msg->payload_ptr))[i]);
+                            printf("0x%02x ", (*((payload_stream_snip_t*) dispatched_msg->payload_ptr))[i]);
                             break;
                     };
 

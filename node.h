@@ -65,7 +65,7 @@ typedef struct {
 typedef openlcb_node_t* active_nodes[LEN_NODE_ARRAY];
 
 
-extern void InitializeNode();
+extern void Initialize_Node();
 
 extern openlcb_node_t* AllocateNode(uint64_t nodeid);
 extern openlcb_node_t* FindNodeByAlias(uint16_t alias);

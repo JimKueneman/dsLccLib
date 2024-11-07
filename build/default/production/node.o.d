@@ -1,12 +1,17 @@
 build/default/production/node.o: node.c node.h openlcb_defines.h \
- main_statemachine.h buffers.h mcu_drv.h
+ openlcb_statemachine.h openlcb_buffers.h mcu_driver.h can_statemachine.h \
+ can_buffers.h
 
 node.h:
 
 openlcb_defines.h:
 
-main_statemachine.h:
+openlcb_statemachine.h:
 
-buffers.h:
+openlcb_buffers.h:
 
-mcu_drv.h:
+mcu_driver.h:
+
+can_statemachine.h:
+
+can_buffers.h:
