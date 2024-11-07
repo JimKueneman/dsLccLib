@@ -10,7 +10,8 @@
 #include "openlcb_defines.h"
 #include "openlcb_statemachine.h"
 #include "node.h"
-#include "can_statemachine.h"
+#include "can_outgoing_statemachine.h"
+#include "can_common_statemachine.h"
 #include "mcu_driver.h"
 #include "openlcb_buffers.h"
 #include "node_definition.h"
@@ -20,7 +21,7 @@
 
 void Initialize_OpenLcb_StateMachine(void) {
 
-    Initialize_CAN_StateMachine();
+   
 
 }
 
@@ -207,9 +208,15 @@ void RunMainStateMachine(openlcb_msg_t* dispatched_msg) {
     can_msg_t can_msg;
 
 
+    // TODO: THIS SHOULD BE IN THE CAN_BUFFER FILE SO CAN IS SEPARATED FROM THE MAIN CODE BASE
+   // if (Outgoing_CAN_BufferEmpty()) 
+    //    LoadOutgoing_CAN_Buffer(Pop_(&outgoing_openlcb_msg_fifo, TRUE));
+    
+    
+    // TODO:  HOW TO SEPARATE THIS FROM CAN AND THE CODEBASE....
     // Try to transmit any outgoing waiting messages
-    if (Outgoing_CAN_BufferEmpty()) 
-        LoadOutgoing_CAN_Buffer(Pop_OpenLcb_Message(&outgoing_openlcb_msg_fifo, TRUE));
+    if (Outgoing_OpenLcb_Msg_Buffer_Empty()) 
+        Load_Outgoing_OpenLcb_Msg_Buffer(Pop_OpenLcb_Message(&outgoing_openlcb_msg_fifo, TRUE));
 
     DispatchMsg(dispatched_msg);
 

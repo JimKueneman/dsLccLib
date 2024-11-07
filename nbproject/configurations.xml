@@ -13,14 +13,15 @@
       <itemPath>openlcb_buffers.h</itemPath>
       <itemPath>openlcb_statemachine.h</itemPath>
       <itemPath>mcu_driver.h</itemPath>
-      <itemPath>can_statemachine.h</itemPath>
       <itemPath>can_buffers.h</itemPath>
+      <itemPath>can_outgoing_statemachine.h</itemPath>
+      <itemPath>can_common_statemachine.h</itemPath>
+      <itemPath>can_incoming_statemachine.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
                    projectFiles="true">
       <itemPath>Makefile</itemPath>
-      <itemPath>OpenLCB.mc3</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -38,8 +39,10 @@
       <itemPath>openlcb_buffers.c</itemPath>
       <itemPath>openlcb_statemachine.c</itemPath>
       <itemPath>mcu_driver.c</itemPath>
-      <itemPath>can_statemachine.c</itemPath>
       <itemPath>can_buffers.c</itemPath>
+      <itemPath>can_outgoing_statemachine.c</itemPath>
+      <itemPath>can_common_statemachine.c</itemPath>
+      <itemPath>can_incoming_statemachine.c</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>

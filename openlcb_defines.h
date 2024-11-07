@@ -36,6 +36,9 @@
 
 // New 10/19/2024
 
+#define APPEND_TRUE  TRUE
+#define APPEND_FALSE FALSE
+
 #define TRUE                             0x01
 #define FALSE                            0x00
 

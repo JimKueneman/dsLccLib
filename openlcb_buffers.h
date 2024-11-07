@@ -1,23 +1,3 @@
-/* Microchip Technology Inc. and its subsidiaries.  You may use this software 
- * and any derivatives exclusively with Microchip products. 
- * 
- * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS".  NO WARRANTIES, WHETHER 
- * EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED 
- * WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A 
- * PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION 
- * WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION. 
- *
- * IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE, 
- * INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND 
- * WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS 
- * BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE.  TO THE 
- * FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS 
- * IN ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF 
- * ANY, THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
- *
- * MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE 
- * TERMS. 
- */
 
 /* 
  * File:   
@@ -125,6 +105,27 @@ extern uint16_t max_pool_openlcb_msg_allocated;
  */
 extern void Initialize_OpenLcb_Buffers();
 
+/*
+ *   [IN] source_alias: 12 bit alias the message came from
+ *   [IN] dest_alias  : 12 bit alias the message was sent to (0 if global message)
+ *   [IN] mti         : OpenLCB MTI (this is NOT a 12 bit CAN MTI)
+ *   [IN] direction   : direction the message is bound (DIRECTION_RX, DIRECTION_TX)
+ *   [IN] data_size: size of the data buffer (ID_DATA_SIZE_BASIC, ID_DATA_SIZE_DATAGRAM, ID_DATA_SIZE_STREAM_SNIP)
+ *   [IN] disable_interrupts: used to disable the CAN interrupts for resource locking (mutex)
+ *   Returns: pointer to an allocated openlcb_msg structure, null if any buffer could not be allocated
+ * Allocates an OpenLCB message and buffer
+ */
+extern openlcb_msg_t* Allocate_OpenLcb_Msg(uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, uint8_t buffer_size, uint8_t disable_interrupts); 
+
+
+/*
+ *   [IN] openlcb_msg: message to release (with its data structure)
+ *   [IN] disable_interrupts: used to disable the CAN interrupts for resource locking (mutex)
+ *   Returns: pointer to an openlcb_msg structure with the passed alias(s) and direction, null if any buffer could not be found
+ * Releases the message that is passed
+ */
+extern void Release_OpenLcb_Msg(openlcb_msg_t* openlcb_msg, uint8_t disable_interrupts);
+
 
 // ****************  FUNCTIONS TO TREAT THE PASSED BUFFER AS A FIFO ****************
  
@@ -177,29 +178,6 @@ extern openlcb_msg_t* Insert_OpenLcb_Message(inprocess_buffer_t* buffer_ptr, ope
  */
 extern openlcb_msg_t* Find_OpenLcb_Message_As_Buffer(inprocess_buffer_t* buffer_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, uint8_t disable_interrupts, uint8_t remove);
 
-/*
- *   [IN] source_alias: 12 bit alias the message came from
- *   [IN] dest_alias  : 12 bit alias the message was sent to (0 if global message)
- *   [IN] mti         : OpenLCB MTI (this is NOT a 12 bit CAN MTI)
- *   [IN] direction   : direction the message is bound (DIRECTION_RX, DIRECTION_TX)
- *   [IN] data_size: size of the data buffer (ID_DATA_SIZE_BASIC, ID_DATA_SIZE_DATAGRAM, ID_DATA_SIZE_STREAM_SNIP)
- *   [IN] disable_interrupts: used to disable the CAN interrupts for resource locking (mutex)
- *   Returns: pointer to an allocated openlcb_msg structure, null if any buffer could not be allocated
- * Allocates an OpenLCB message and buffer
- */
-extern openlcb_msg_t* Allocate_OpenLcb_Msg(uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, uint8_t buffer_size, uint8_t disable_interrupts); 
-
-
-/*
- *   [IN] openlcb_msg: message to release (with its data structure)
- *   [IN] disable_interrupts: used to disable the CAN interrupts for resource locking (mutex)
- *   Returns: pointer to an openlcb_msg structure with the passed alias(s) and direction, null if any buffer could not be found
- * Releases the message that is passed
- */
-extern void Release_OpenLcb_Msg(openlcb_msg_t* openlcb_msg, uint8_t disable_interrupts);
-
-
-extern void ClearOpenLcbMessage( openlcb_msg_t* msg);
 
 #ifdef	__cplusplus
 extern "C" {

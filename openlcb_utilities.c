@@ -10,7 +10,7 @@
 #include "openlcb_buffers.h"
 #include "openlcb_defines.h"
 #include "debug.h"
-#include "can_statemachine.h"
+#include "can_outgoing_statemachine.h"
 
 void CopyNodeIDToMessage(openlcb_msg_t* msg, uint64_t node_id) {
 

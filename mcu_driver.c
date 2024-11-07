@@ -15,7 +15,8 @@
 #include "mcu_driver.h"
 #include "debug.h"
 #include "openlcb_defines.h"
-#include "can_statemachine.h"
+#include "can_outgoing_statemachine.h"
+#include "can_incoming_statemachine.h"
 #include "openlcb_buffers.h"
 #include "node.h"
 
@@ -173,7 +174,7 @@ void __attribute__((interrupt(no_auto_psv))) _U1RXInterrupt(void) {
             
             printf("C1RXFUL1: 0x%x\n", C1RXFUL1);
             printf("C1RXFUL2: 0x%x\n", C1RXFUL2);
-            if (Outgoing_CAN_BufferEmpty()) {
+            if (Outgoing_OpenLcb_Msg_Buffer_Empty()) {
                 printf("Outgoing_CAN_BufferEmpty\n");
             } else {
                 printf("NOT Outgoing_CAN_BufferEmpty\n");
@@ -314,7 +315,7 @@ void __attribute__((interrupt(no_auto_psv))) _C1Interrupt(void) {
     } else { // TX Interrupt
         if (C1INTFbits.TBIF) {
 
-            Statemachine_Outgoing_CAN(TRUE);
+     //       Statemachine_Outgoing_CAN(TRUE);
 
             C1INTFbits.TBIF = 0;
 

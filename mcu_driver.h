@@ -13,7 +13,7 @@
 
 #include <xc.h> // include processor files - each processor file is guarded. 
 #include "openlcb_buffers.h"
-#include "can_statemachine.h"
+#include "can_outgoing_statemachine.h"
 
 
 // Timer -----------------------------------------------------------------------

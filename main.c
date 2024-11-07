@@ -51,6 +51,8 @@
 #include "openlcb_buffers.h"
 #include "openlcb_defines.h"
 #include "openlcb_statemachine.h"
+#include "can_outgoing_statemachine.h"
+#include "can_incoming_statemachine.h"
 #include "debug.h"
 #include "node.h"
 #include "openlcb_utilities.h"
@@ -134,7 +136,8 @@ int main(void) {
     Initialize_OpenLcb_StateMachine();
     
     Initialize_CAN_Buffers();
-    Initialize_CAN_StateMachine();
+    Initialize_CAN_Outgoing_StateMachine();
+    Initialize_CAN_Incoming_StateMachine();
     
 #ifdef DEBUG
     
