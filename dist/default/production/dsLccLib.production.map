@@ -187,7 +187,7 @@ section                    address      alignment gaps    total length  (dec)
 .data                       0x1134                   0            0x60  (96)
 .bss                        0x1194                   0             0xa  (10)
 .data                       0x119e                   0             0x2  (2)
-_0x1101a4140672cf08d        0x1200                   0           0x200  (512)
+_0x10bf89140672cf30b        0x1200                   0           0x200  (512)
 .bss                        0x1400                   0          0x161c  (5660)
 .bss                        0x2a1c                   0            0xf4  (244)
 
@@ -276,8 +276,8 @@ External Symbols in Program Memory (by address):
 
                   0x000200                  __resetPRI
                   0x00023c                  __psv_init
-                  0x000248                  __data_init_extended
                   0x000248                  __data_init
+                  0x000248                  __data_init_extended
                   0x00030a                  __OscillatorFail
                   0x000310                  __AddressError
                   0x000316                  __StackError
@@ -363,10 +363,10 @@ External Symbols in Program Memory (by address):
                   0x00384a                  _HandleIncomingLegacySNIP
                   0x003978                  _TestForAliasConflict
                   0x003a3a                  _HandleIncoming_CAN_Control_Frame
-                  0x003be0                  _HandleIncomingCAN_Msg
+                  0x003be0                  _Statemachine_Incoming_CAN
                   0x003e9c                  _Outgoing_CAN_BufferEmpty
                   0x003eae                  _LoadOutgoing_CAN_Buffer
-                  0x003ed2                  _HandleOutgoingCAN_Msg
+                  0x003ed2                  _Statemachine_Outgoing_CAN
                   0x00419c                  _PrintAliasAndNodeID
                   0x0041ee                  _PrintContentsFIFO
                   0x004248                  _ForceFlushAndFreeFIFO
@@ -458,10 +458,8 @@ External Symbols in Program Memory (by name):
                   0x0036fa                  _HandleIncomingCAN_FirstFrame
                   0x0037dc                  _HandleIncomingCAN_LastFrame
                   0x003784                  _HandleIncomingCAN_MiddleFrame
-                  0x003be0                  _HandleIncomingCAN_Msg
                   0x00384a                  _HandleIncomingLegacySNIP
                   0x003a3a                  _HandleIncoming_CAN_Control_Frame
-                  0x003ed2                  _HandleOutgoingCAN_Msg
                   0x004b96                  _HandleProtocolSupportInquiry
                   0x004a62                  _HandleSimpleNodeInfoRequest
                   0x005ee2                  _HandleTime
@@ -497,6 +495,8 @@ External Symbols in Program Memory (by name):
                   0x00522a                  _Release_OpenLcb_Msg
                   0x004d34                  _RunMainStateMachine
                   0x00359c                  _Send_Raw_CAN_Message
+                  0x003be0                  _Statemachine_Incoming_CAN
+                  0x003ed2                  _Statemachine_Outgoing_CAN
                   0x003978                  _TestForAliasConflict
                   0x002512                  _USER_DEFINED_PROTOCOL_SUPPORT
                   0x005a74                  __100msTimeTickNode
@@ -856,7 +856,7 @@ __FOSCSEL
 
 __FGS             0x00affa          0x2
  *(__FGS.sec*)
- __FGS.sec        0x00affa          0x2 /CW/_FGSXNŠ…Ñ
+ __FGS.sec        0x00affa          0x2 /CW/_FGSX†ˆ{Š
                   0x00affa                  __FGS.sec
 
 __FUID0
@@ -874,7 +874,7 @@ __FUID3
 .comment
  *(.comment)
 
-.debug_info       0x000000       0x8fb7
+.debug_info       0x000000       0x8fbf
  *(.debug_info)
  .debug_info      0x000000        0xdc1 build/default/production/main.o
  .debug_info      0x000dc1        0x344 build/default/production/traps.o
@@ -885,11 +885,11 @@ __FUID3
  .debug_info      0x002f6a        0x98c build/default/production/openlcb_buffers.o
  .debug_info      0x0038f6        0x7f4 build/default/production/openlcb_statemachine.o
  .debug_info      0x0040ea       0x3954 build/default/production/mcu_driver.o
- .debug_info      0x007a3e        0xfd1 build/default/production/can_statemachine.o
- .debug_info      0x008a0f        0x3ff build/default/production/can_buffers.o
- .debug_info      0x008e0e         0x90 /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(extendsfdf.EP_o)
- .debug_info      0x008e9e         0x8d /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(funpack.EP_o)
- .debug_info      0x008f2b         0x8c /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(mulsi3.EP_o)
+ .debug_info      0x007a3e        0xfd9 build/default/production/can_statemachine.o
+ .debug_info      0x008a17        0x3ff build/default/production/can_buffers.o
+ .debug_info      0x008e16         0x90 /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(extendsfdf.EP_o)
+ .debug_info      0x008ea6         0x8d /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(funpack.EP_o)
+ .debug_info      0x008f33         0x8c /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(mulsi3.EP_o)
  *(.gnu.linkonce.wi.*)
 
 .debug_abbrev     0x000000        0xf14
@@ -909,22 +909,22 @@ __FUID3
  .debug_abbrev    0x000eec         0x14 /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(funpack.EP_o)
  .debug_abbrev    0x000f00         0x14 /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(mulsi3.EP_o)
 
-.debug_line       0x000000       0x124d
+.debug_line       0x000000       0x124b
  *(.debug_line)
  .debug_line      0x000000        0x1a0 build/default/production/main.o
  .debug_line      0x0001a0        0x121 build/default/production/traps.o
- .debug_line      0x0002c1        0x239 build/default/production/debug.o
- .debug_line      0x0004fa         0xf8 build/default/production/node.o
- .debug_line      0x0005f2         0xf7 build/default/production/openlcb_utilities.o
- .debug_line      0x0006e9         0x84 build/default/production/callbacks.o
- .debug_line      0x00076d        0x164 build/default/production/openlcb_buffers.o
- .debug_line      0x0008d1        0x1b3 build/default/production/openlcb_statemachine.o
- .debug_line      0x000a84        0x39f build/default/production/mcu_driver.o
- .debug_line      0x000e23        0x27c build/default/production/can_statemachine.o
- .debug_line      0x00109f         0xd1 build/default/production/can_buffers.o
- .debug_line      0x001170         0x59 /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(extendsfdf.EP_o)
- .debug_line      0x0011c9         0x4a /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(funpack.EP_o)
- .debug_line      0x001213         0x3a /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(mulsi3.EP_o)
+ .debug_line      0x0002c1        0x237 build/default/production/debug.o
+ .debug_line      0x0004f8         0xf8 build/default/production/node.o
+ .debug_line      0x0005f0         0xf7 build/default/production/openlcb_utilities.o
+ .debug_line      0x0006e7         0x84 build/default/production/callbacks.o
+ .debug_line      0x00076b        0x164 build/default/production/openlcb_buffers.o
+ .debug_line      0x0008cf        0x1b3 build/default/production/openlcb_statemachine.o
+ .debug_line      0x000a82        0x39f build/default/production/mcu_driver.o
+ .debug_line      0x000e21        0x27c build/default/production/can_statemachine.o
+ .debug_line      0x00109d         0xd1 build/default/production/can_buffers.o
+ .debug_line      0x00116e         0x59 /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(extendsfdf.EP_o)
+ .debug_line      0x0011c7         0x4a /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(funpack.EP_o)
+ .debug_line      0x001211         0x3a /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(mulsi3.EP_o)
 
 .debug_frame      0x000000        0xcf8
  *(.debug_frame)
@@ -959,7 +959,7 @@ __FUID3
  *(.debug_macinfo)
 
 .debug_pubnames
-                  0x000000        0xbc9
+                  0x000000        0xbd1
  *(.debug_pubnames)
  .debug_pubnames
                   0x000000         0x67 build/default/production/main.o
@@ -980,9 +980,9 @@ __FUID3
  .debug_pubnames
                   0x00065a        0x29b build/default/production/mcu_driver.o
  .debug_pubnames
-                  0x0008f5        0x218 build/default/production/can_statemachine.o
+                  0x0008f5        0x220 build/default/production/can_statemachine.o
  .debug_pubnames
-                  0x000b0d         0xbc build/default/production/can_buffers.o
+                  0x000b15         0xbc build/default/production/can_buffers.o
 
 .debug_ranges
  *(.debug_ranges)
@@ -2118,7 +2118,7 @@ LOAD /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libm-elf.a
 LOAD /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-elf.a
 END GROUP
 OUTPUT(dist/default/production/dsLccLib.production.elf elf32-pic30)
-LOAD /CW/_FGSXNŠ…Ñ
+LOAD /CW/_FGSX†ˆ{Š
 LOAD jump_table
 LOAD default_isr
 LOAD data_init
@@ -2282,9 +2282,9 @@ __xc_reference_data
  .nbss              0x1018          0x2 build/default/production/callbacks.o
                     0x1018                  _AliasChangeCallbackFunc
 
-_0x1101a4140672cf08d
+_0x10bf89140672cf30b
                     0x1200        0x200
- _0x1101a4140672cf08d
+ _0x10bf89140672cf30b
                     0x1200        0x200 build/default/production/mcu_driver.o
                     0x1200                  _ecan1msgBuf
 
@@ -2433,10 +2433,10 @@ _0x1101a4140672cf08d
                   0x00384a                  _HandleIncomingLegacySNIP
                   0x003978                  _TestForAliasConflict
                   0x003a3a                  _HandleIncoming_CAN_Control_Frame
-                  0x003be0                  _HandleIncomingCAN_Msg
+                  0x003be0                  _Statemachine_Incoming_CAN
                   0x003e9c                  _Outgoing_CAN_BufferEmpty
                   0x003eae                  _LoadOutgoing_CAN_Buffer
-                  0x003ed2                  _HandleOutgoingCAN_Msg
+                  0x003ed2                  _Statemachine_Outgoing_CAN
  .text            0x00419c        0x8be build/default/production/debug.o
                   0x00419c                  _PrintAliasAndNodeID
                   0x0041ee                  _PrintContentsFIFO

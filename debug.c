@@ -88,10 +88,10 @@ void PrintBufferStats() {
     for (int iIndex = 0; iIndex < LEN_OPENLCB_MSG_INPROCESS_BUFFER; iIndex++) {
         if (incoming_openlcb_inprocess_msg_list.list[iIndex]) 
             count = count + 1;
-      
-    printf("Incoming Inprocess Msg Buffer: %d\n\n", count);
     
     }
+    
+    printf("Incoming Inprocess Msg Buffer: %d\n\n", count);
     
   //  printf("Incoming Msg In-process FIFO: %d\n", CountFIFO(&incoming_openlcb_inprocess_msg_list));
     
