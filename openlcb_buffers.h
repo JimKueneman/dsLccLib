@@ -176,7 +176,9 @@ extern openlcb_msg_t* Insert_OpenLcb_Message(inprocess_buffer_t* buffer_ptr, ope
  * 
  *   Returns: pointer to an message with matches to the passed alias(s) and mti; returns null if could not be found
  */
-extern openlcb_msg_t* Find_OpenLcb_Message_As_Buffer(inprocess_buffer_t* buffer_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, uint8_t disable_interrupts, uint8_t remove);
+extern openlcb_msg_t* Find_OpenLcb_Message(inprocess_buffer_t* buffer_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, uint8_t disable_interrupts, uint8_t remove);
+
+extern void Process_OpenLCB_Messages();
 
 
 #ifdef	__cplusplus

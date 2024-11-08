@@ -50,9 +50,9 @@
 #include "stdio.h"
 #include "openlcb_buffers.h"
 #include "openlcb_defines.h"
-#include "openlcb_statemachine.h"
 #include "can_outgoing_statemachine.h"
 #include "can_incoming_statemachine.h"
+#include "openlcb_statemachine.h"
 #include "debug.h"
 #include "node.h"
 #include "openlcb_utilities.h"
@@ -124,7 +124,7 @@ void AliasAllocatedCallback(uint16_t alias, uint64_t node_id) {
     PrintAliasAndNodeID(alias, node_id);
 }
 
-//#define DEBUG
+#define DEBUG
 
 int main(void) {
 
@@ -135,7 +135,7 @@ int main(void) {
     Initialize_OpenLcb_Buffers(); 
     Initialize_OpenLcb_StateMachine();
     
-    Initialize_CAN_Buffers();
+    Initialize_CAN_Frame_Buffers();
     Initialize_CAN_Outgoing_StateMachine();
     Initialize_CAN_Incoming_StateMachine();
     
@@ -150,7 +150,7 @@ int main(void) {
     msg.payload[2] = 0xCC;
     msg.payload[3] = 0xDD;
     
-    Push_CAN_Message(&msg, FALSE);
+    Push_CAN_Frame_Message(&msg, FALSE);
     
     msg.identifier = 0;
     msg.payload_size = 0;
@@ -159,7 +159,7 @@ int main(void) {
     msg.payload[0] = 0;
     msg.payload[0] = 0;
     
-    Pop_CAN_Message(&msg, FALSE);
+    Pop_CAN_Frame_Message(&msg, FALSE);
     
 #endif
     
@@ -187,11 +187,12 @@ int main(void) {
 
 
     while (1) {
-
-
-
+        
         HandleTime();
         HandleUART();
+        
+        Process_CAN_Frame_Messages();
+        Process_OpenLCB_Messages();
 
 
         dispatched_msg = Pop_OpenLcb_Message(&incoming_openlcb_msg_fifo, TRUE);

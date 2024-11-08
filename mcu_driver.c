@@ -315,10 +315,8 @@ void __attribute__((interrupt(no_auto_psv))) _C1Interrupt(void) {
     } else { // TX Interrupt
         if (C1INTFbits.TBIF) {
 
-     //       Statemachine_Outgoing_CAN(TRUE);
-
             C1INTFbits.TBIF = 0;
-
+            
         }
 
     }

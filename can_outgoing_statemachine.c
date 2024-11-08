@@ -23,15 +23,13 @@ uint16_t outgoing_openlcb_msg_index = 0;
 payload_bytes_can_t openlcb_msg_can_data;
 uint8_t openlcb_last_frame = 0;
 
-can_msg_t outoging_can_frame_msg;
-
+can_msg_t outgoing_can_frame_msg;
 
 void Initialize_CAN_Outgoing_StateMachine() {
 
-    outoging_can_frame_msg.identifier = 0;
-    
-}
+    outgoing_can_frame_msg.identifier = 0;
 
+}
 
 uint8_t Send_Raw_CAN_Message(uint8_t tx_channel, can_msg_t* msg, uint8_t block) {
 
@@ -71,34 +69,38 @@ uint8_t Send_Raw_CAN_Message(uint8_t tx_channel, can_msg_t* msg, uint8_t block) 
 
 }
 
-
 uint8_t Outgoing_CAN_Msg_Buffer_Empty() {
-    
-    return (outoging_can_frame_msg.identifier == 0);
-    
-}
 
+    if ((outgoing_can_frame_msg.identifier == 0) && Ecan1TxBufferClear(TX_CHANNEL_CAN_CONTROL)) 
+        return TRUE;
+    else
+        return FALSE;
+
+}
 
 uint8_t Load_Outgoing_CAN_Msg_Buffer(can_msg_t* msg) {
-    
-    if (outoging_can_frame_msg.identifier == 0) {
-       
-        outoging_can_frame_msg = *msg;
-        
+
+    if (outgoing_can_frame_msg.identifier == 0) {
+
+        outgoing_can_frame_msg = *msg;
+
         return TRUE;
     }
-    
-    return FALSE;
-    
-}
 
+    return FALSE;
+
+}
 
 uint8_t Outgoing_OpenLcb_Msg_Buffer_Empty() {
 
-    if (outgoing_openlcb_msg) {
+    if (outgoing_openlcb_msg && Ecan1TxBufferClear(TX_CHANNEL_OPENLCB_MSG)) {
+        
         return FALSE;
+        
     } else {
+        
         return TRUE;
+        
     }
 
 }
@@ -112,10 +114,7 @@ uint8_t Load_Outgoing_OpenLcb_Msg_Buffer(openlcb_msg_t* msg) {
         outgoing_openlcb_msg = msg;
         outgoing_openlcb_msg_index = 0;
         openlcb_last_frame = FALSE;
-
-        // Kick it off.
-   //     Statemachine_Outgoing_CAN(FALSE);
-
+        
         result = TRUE;
 
     }
@@ -126,12 +125,22 @@ uint8_t Load_Outgoing_OpenLcb_Msg_Buffer(openlcb_msg_t* msg) {
 
 // CAN TX Interrupt will call this if it is a multi-frame message to keep it pumping..
 
-uint8_t Statemachine_Outgoing_CAN(uint8_t called_from_interrupt) {
+void Statemachine_Outgoing_CAN() {
 
-    uint8_t result = FALSE;
+
+    if (outgoing_can_frame_msg.identifier != 0) {
+
+        
+        Ecan1WriteTxMsgBufId(TX_CHANNEL_CAN_CONTROL, outgoing_can_frame_msg.identifier, TRUE, FALSE);
+        Ecan1WriteTxMsgBufData(TX_CHANNEL_CAN_CONTROL, outgoing_can_frame_msg.payload_size, &outgoing_can_frame_msg.payload);
+        Ecan1TxBufferSetTransmit(TX_CHANNEL_CAN_CONTROL, TRUE);
+        
+        outgoing_can_frame_msg.identifier = 0;
+
+    }
 
     if (!outgoing_openlcb_msg)
-        return result;
+        return;
 
     uint32_t identifier = 0;
 
@@ -173,7 +182,7 @@ uint8_t Statemachine_Outgoing_CAN(uint8_t called_from_interrupt) {
 
                 if (openlcb_last_frame) {
 
-                    Release_OpenLcb_Msg(outgoing_openlcb_msg, called_from_interrupt);
+                    Release_OpenLcb_Msg(outgoing_openlcb_msg, TRUE);
                     // reset for the next message
                     outgoing_openlcb_msg = (void*) 0;
                     outgoing_openlcb_msg_index = 0;
@@ -249,7 +258,7 @@ uint8_t Statemachine_Outgoing_CAN(uint8_t called_from_interrupt) {
 
                 if (openlcb_last_frame) {
 
-                    Release_OpenLcb_Msg(outgoing_openlcb_msg, called_from_interrupt);
+                    Release_OpenLcb_Msg(outgoing_openlcb_msg, TRUE);
                     // reset for the next message
                     outgoing_openlcb_msg = (void*) 0;
                     outgoing_openlcb_msg_index = 0;
@@ -279,7 +288,7 @@ uint8_t Statemachine_Outgoing_CAN(uint8_t called_from_interrupt) {
 
             Ecan1TxBufferSetTransmit(TX_CHANNEL_OPENLCB_MSG, TRUE);
 
-            Release_OpenLcb_Msg(outgoing_openlcb_msg, called_from_interrupt);
+            Release_OpenLcb_Msg(outgoing_openlcb_msg, TRUE);
             // reset for the next message
             outgoing_openlcb_msg = (void*) 0;
             outgoing_openlcb_msg_index = 0;
@@ -292,6 +301,8 @@ uint8_t Statemachine_Outgoing_CAN(uint8_t called_from_interrupt) {
 
     }
 
-    return result;
 
+
+    return;
+    
 }

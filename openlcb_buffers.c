@@ -35,6 +35,19 @@ payload_stream_snip_t payload_stream_snip_pool[LEN_DATA_SIZE_STREAM_SNIP_POOL];
 uint16_t pool_openlcb_msg_allocated = 0;
 uint16_t max_pool_openlcb_msg_allocated = 0;
 
+
+void Process_OpenLCB_Messages() {
+    
+    if (Outgoing_OpenLcb_Msg_Buffer_Empty()) 
+        
+        Load_Outgoing_OpenLcb_Msg_Buffer(Pop_OpenLcb_Message(&outgoing_openlcb_msg_fifo, TRUE));
+        
+    // Pump the message engine 
+    Statemachine_Outgoing_CAN();
+    
+}
+
+
 /*
  * [IN] source_alias
  * [IN] mti
@@ -105,24 +118,6 @@ openlcb_msg_t* Allocate_OpenLcb_Msg(uint16_t source_alias, uint64_t source_id, u
 
 };
 
-void Release_OpenLcb_Msg(openlcb_msg_t* openlcb_msg, uint8_t disable_interrupts) {
-
-    if (disable_interrupts)
-        Ecan1EnableInterrupt(FALSE);
-
-    if (openlcb_msg) {
-
-        openlcb_msg->state.allocated = 0;
-        pool_openlcb_msg_allocated = pool_openlcb_msg_allocated - 1;
-
-    }
-
-    if (disable_interrupts)
-        Ecan1EnableInterrupt(TRUE);
-
-};
-
-
 /*
  * Uses passed array as a raw array buffer and puts the passed message in the first available slot it finds
  *     [IN] buffer_ptr: the array to operate on
@@ -154,7 +149,7 @@ openlcb_msg_t* Insert_OpenLcb_Message(inprocess_buffer_t* buffer_ptr, openlcb_ms
 
 };
 
-openlcb_msg_t* Find_OpenLcb_Message_As_Buffer(inprocess_buffer_t* buffer_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, uint8_t disable_interrupts, uint8_t remove) {
+openlcb_msg_t* Find_OpenLcb_Message(inprocess_buffer_t* buffer_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, uint8_t disable_interrupts, uint8_t remove) {
 
     openlcb_msg_t* result = (void*) 0;
 
@@ -279,7 +274,22 @@ uint8_t Is_OpenLcb_FIFO_Empty(openlcb_msg_buffer_t* fifo_ptr, uint8_t disable_in
     
 }
 
+void Release_OpenLcb_Msg(openlcb_msg_t* openlcb_msg, uint8_t disable_interrupts) {
 
+    if (disable_interrupts)
+        Ecan1EnableInterrupt(FALSE);
+
+    if (openlcb_msg) {
+
+        openlcb_msg->state.allocated = 0;
+        pool_openlcb_msg_allocated = pool_openlcb_msg_allocated - 1;
+
+    }
+
+    if (disable_interrupts)
+        Ecan1EnableInterrupt(TRUE);
+
+};
 
 void Initialize_OpenLcb_Buffers() {
 

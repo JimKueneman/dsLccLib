@@ -63,7 +63,7 @@ extern can_fifo_t outgoing_can_fifo;
 extern uint16_t pool_can_msg_allocated;
 extern uint16_t max_pool_can_msg_allocated;
 
-extern void Initialize_CAN_Buffers();
+extern void Initialize_CAN_Frame_Buffers();
 
 /*
  * Puts the passed message on the passed FIFO stack
@@ -73,7 +73,7 @@ extern void Initialize_CAN_Buffers();
  * 
  * Returns the message passed if it was placed on the FIFO; NULL if there was no space
  */
-extern uint8_t Push_CAN_Message(can_msg_t* msg, uint8_t disable_interrupts);
+extern uint8_t Push_CAN_Frame_Message(can_msg_t* msg, uint8_t disable_interrupts);
 
 
 /*
@@ -83,10 +83,11 @@ extern uint8_t Push_CAN_Message(can_msg_t* msg, uint8_t disable_interrupts);
  * 
  * Returns: TRUE or FALSE
  */
-extern uint8_t Pop_CAN_Message(can_msg_t* msg, uint8_t disable_interrupts);
-
+extern uint8_t Pop_CAN_Frame_Message(can_msg_t* msg, uint8_t disable_interrupts);
 
 extern uint8_t Is_CAN_FIFO_Empty(uint8_t disable_interrupts);
+
+extern void Process_CAN_Frame_Messages();
 
 
 

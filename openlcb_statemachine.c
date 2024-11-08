@@ -17,6 +17,7 @@
 #include "node_definition.h"
 #include "openlcb_utilities.h"
 #include "callbacks.h"
+#include "debug.h"
 #include "stdio.h"  // printf
 
 void Initialize_OpenLcb_StateMachine(void) {
@@ -208,16 +209,6 @@ void RunMainStateMachine(openlcb_msg_t* dispatched_msg) {
     can_msg_t can_msg;
 
 
-    // TODO: THIS SHOULD BE IN THE CAN_BUFFER FILE SO CAN IS SEPARATED FROM THE MAIN CODE BASE
-   // if (Outgoing_CAN_BufferEmpty()) 
-    //    LoadOutgoing_CAN_Buffer(Pop_(&outgoing_openlcb_msg_fifo, TRUE));
-    
-    
-    // TODO:  HOW TO SEPARATE THIS FROM CAN AND THE CODEBASE....
-    // Try to transmit any outgoing waiting messages
-    if (Outgoing_OpenLcb_Msg_Buffer_Empty()) 
-        Load_Outgoing_OpenLcb_Msg_Buffer(Pop_OpenLcb_Message(&outgoing_openlcb_msg_fifo, TRUE));
-
     DispatchMsg(dispatched_msg);
 
     nextnode = NextActiveNode();
@@ -255,10 +246,8 @@ void RunMainStateMachine(openlcb_msg_t* dispatched_msg) {
 
                 can_msg.payload_size = 0;
                 can_msg.identifier = RESERVED_TOP_BIT | CAN_CONTROL_FRAME_CID7 | (((nextnode->id >> 24) & 0xFFF000) | nextnode->alias); // AA0203040506
-                
-                Push_CAN_Message(&can_msg, TRUE);
-
-                if (Push_CAN_Message(&can_msg, TRUE))
+                  
+                if (Push_CAN_Frame_Message(&can_msg, TRUE))
                     nextnode->state.run = RUNSTATE_SEND_CHECK_ID_06;
 
                 break;
@@ -268,7 +257,7 @@ void RunMainStateMachine(openlcb_msg_t* dispatched_msg) {
                 can_msg.payload_size = 0;
                 can_msg.identifier = RESERVED_TOP_BIT | CAN_CONTROL_FRAME_CID6 | (((nextnode->id >> 12) & 0xFFF000) | nextnode->alias);
 
-                if (Push_CAN_Message(&can_msg, TRUE))
+                if (Push_CAN_Frame_Message(&can_msg, TRUE))
                     nextnode->state.run = RUNSTATE_SEND_CHECK_ID_05;
 
                 break;
@@ -278,7 +267,7 @@ void RunMainStateMachine(openlcb_msg_t* dispatched_msg) {
                 can_msg.payload_size = 0;
                 can_msg.identifier = RESERVED_TOP_BIT | CAN_CONTROL_FRAME_CID5 | ((nextnode->id & 0xFFF000) | nextnode->alias);
 
-                if (Push_CAN_Message(&can_msg, TRUE))
+                if (Push_CAN_Frame_Message(&can_msg, TRUE))
                     nextnode->state.run = RUNSTATE_SEND_CHECK_ID_04;
 
                 break;
@@ -288,7 +277,7 @@ void RunMainStateMachine(openlcb_msg_t* dispatched_msg) {
                 can_msg.payload_size = 0;
                 can_msg.identifier = RESERVED_TOP_BIT | CAN_CONTROL_FRAME_CID4 | (((nextnode->id << 12) & 0xFFF000) | nextnode->alias);
 
-                if (Push_CAN_Message(&can_msg, TRUE))
+                if (Push_CAN_Frame_Message(&can_msg, TRUE))
                     nextnode->state.run = RUNSTATE_WAIT_200ms;
 
                 break;
@@ -308,7 +297,7 @@ void RunMainStateMachine(openlcb_msg_t* dispatched_msg) {
                 can_msg.identifier = RESERVED_TOP_BIT | CAN_CONTROL_FRAME_RID | nextnode->alias;
                 can_msg.payload_size = 0;
 
-                if (Push_CAN_Message(&can_msg, TRUE)) {
+                if (Push_CAN_Frame_Message(&can_msg, TRUE)) {
 
                     nextnode->state.run = RUNSTATE_TRANSMIT_ALIAS_MAP_DEFINITION;
 
@@ -328,7 +317,7 @@ void RunMainStateMachine(openlcb_msg_t* dispatched_msg) {
                     local_id = local_id >> 8;
                 }
 
-                if (Push_CAN_Message(&can_msg, TRUE)) {
+                if (Push_CAN_Frame_Message(&can_msg, TRUE)) {
 
                     nextnode->state.permitted = TRUE;
                     nextnode->state.run = RUNSTATE_TRANSMIT_INITIALIZATION_COMPLETE;
@@ -347,6 +336,7 @@ void RunMainStateMachine(openlcb_msg_t* dispatched_msg) {
                 if (openlcb_msg) {
 
                     CopyNodeIDToMessage(openlcb_msg, nextnode->id);
+                    
                     Push_OpenLcb_Message(&outgoing_openlcb_msg_fifo, openlcb_msg, TRUE);
 
                     nextnode->state.run = RUNSTATE_TRANSMIT_EVENTS;

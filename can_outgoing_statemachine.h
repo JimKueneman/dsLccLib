@@ -37,10 +37,8 @@ extern uint8_t Outgoing_CAN_Msg_Buffer_Empty();
 // so give it to this function then forget it.
 extern uint8_t Load_Outgoing_CAN_Msg_Buffer(can_msg_t* msg);
 
-// Takes an outgoing openlcb message and converts it (or breaks it up into multiple messages) to send to the CAN driver to put out on the CAN bus 
-// Note there is no reason to call this directly.  It is called vis the LoadOutgoing_CAN_Buffer to kick off the transmission but after that the
-// CAN TX interrupt pumps it until it is finished then it is released.
-extern uint8_t Statemachine_Outgoing_CAN(uint8_t called_from_interrupt); 
+// Call as often as possible to pump out the message(s) loaded via Load_Outgoing_CAN_Msg_Buffer
+extern void Statemachine_Outgoing_CAN(); 
 
 
 // TODO Insert declarations or function prototypes (right here) to leverage 

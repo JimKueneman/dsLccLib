@@ -81,25 +81,25 @@ void TestForAliasConflict(can_msg_t* msg, uint32_t can_control_msg, uint8_t add_
 
         if (nodes.node[iIndex].state.permitted) {
 
-            printf("node: %d\n", iIndex);
-
             if ((nodes.node[iIndex].alias == (msg->identifier & 0xFFF))) { // Check if we own this Alias
-
-                printf("Found\n");
+             
                 if (add_payload_node_id)
+                    
                     CopyNodeIDToCANBuffer(&out_msg, nodes.node[iIndex].id);
+                
                 else
                     out_msg.payload_size = 0;
 
                 out_msg.identifier = RESERVED_TOP_BIT | can_control_msg | nodes.node[iIndex].alias;
 
-                Push_CAN_Message(&out_msg, TRUE);
+                Push_CAN_Frame_Message(&out_msg, TRUE);
 
                 break;
 
             }
 
         }
+        
     }
 
 }

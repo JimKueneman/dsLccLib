@@ -16,6 +16,12 @@
 
 uint8_t print_msg = FALSE;
 
+void PrintCAN_Identifier(uint32_t identifier)  {
+    
+    printf("0x%04X", (uint16_t) ((identifier >> 16) & 0xFFFF));
+    printf("%04X\n",  (uint16_t) (identifier & 0xFFFF));
+}
+
 void PrintAliasAndNodeID(uint16_t alias, uint64_t node_id) {
     
     printf("Alias: %04X\n", alias);

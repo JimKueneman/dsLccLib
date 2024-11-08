@@ -43,6 +43,7 @@ extern void PrintBufferStats(void);
 extern void ForceFlushAndFreeFIFO(openlcb_msg_buffer_t* fifo);
 extern void PrintContentsFIFO(openlcb_msg_buffer_t* fifo);
 extern void PrintAliasAndNodeID(uint16_t alias, uint64_t node_id);
+extern void PrintCAN_Identifier(uint32_t identifier);
 
 
 extern uint8_t print_msg;

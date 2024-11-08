@@ -1,5 +1,5 @@
 /*
- * File:   engine_can_message.c
+ * File:   can_incoming_statemachine.c
  * Author: jimkueneman
  *
  * Created on February 7, 2024, 6:03 AM
@@ -90,7 +90,7 @@ openlcb_msg_t* AllocateAndStoreToOpenLcbMsg(inprocess_buffer_t* list_ptr, uint16
 
 openlcb_msg_t* HandleIncoming_CAN_FirstFrame(inprocess_buffer_t* buffer_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, can_msg_t* ecan_msg, uint8_t payload_start, uint8_t data_size) {
 
-    openlcb_msg_t* result = Find_OpenLcb_Message_As_Buffer(buffer_ptr, source_alias, source_id, dest_alias, dest_id, mti, FALSE, FALSE);
+    openlcb_msg_t* result = Find_OpenLcb_Message(buffer_ptr, source_alias, source_id, dest_alias, dest_id, mti, FALSE, FALSE);
 
     if (!result) {
 
@@ -120,7 +120,7 @@ openlcb_msg_t* HandleIncoming_CAN_FirstFrame(inprocess_buffer_t* buffer_ptr, uin
 
 openlcb_msg_t* HandleIncoming_CAN_MiddleFrame(inprocess_buffer_t* buffer_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, can_msg_t* ecan_msg, uint8_t payload_start) {
 
-    openlcb_msg_t* result = Find_OpenLcb_Message_As_Buffer(buffer_ptr, source_alias, source_id, dest_alias, dest_id, mti, FALSE, FALSE);
+    openlcb_msg_t* result = Find_OpenLcb_Message(buffer_ptr, source_alias, source_id, dest_alias, dest_id, mti, FALSE, FALSE);
 
     if (result) {
 
@@ -139,7 +139,7 @@ openlcb_msg_t* HandleIncoming_CAN_MiddleFrame(inprocess_buffer_t* buffer_ptr, ui
 
 openlcb_msg_t* HandleIncoming_CAN_LastFrame(inprocess_buffer_t* buffer_ptr, uint16_t source_alias, uint64_t source_id, uint16_t dest_alias, uint64_t dest_id, uint16_t mti, can_msg_t* ecan_msg, uint8_t payload_start) {
 
-    openlcb_msg_t* result = Find_OpenLcb_Message_As_Buffer(buffer_ptr, source_alias, source_id, dest_alias, dest_id, mti, FALSE, TRUE);
+    openlcb_msg_t* result = Find_OpenLcb_Message(buffer_ptr, source_alias, source_id, dest_alias, dest_id, mti, FALSE, TRUE);
 
     if (result) {
 
@@ -172,7 +172,7 @@ void HandleIncoming_CAN_LegacySNIP(inprocess_buffer_t* buffer_ptr, uint16_t sour
     // Early implementations did not have the multi-frame bits to use... special case
 
 
-    openlcb_msg_t* openlcb_msg_inprocess = Find_OpenLcb_Message_As_Buffer(buffer_ptr, source_alias, source_id, dest_alias, dest_id, mti, FALSE, FALSE);
+    openlcb_msg_t* openlcb_msg_inprocess = Find_OpenLcb_Message(buffer_ptr, source_alias, source_id, dest_alias, dest_id, mti, FALSE, FALSE);
 
 
     if (!openlcb_msg_inprocess) { // Do we have one in process?
@@ -238,8 +238,6 @@ void HandleIncoming_CAN_Control_Frame(can_msg_t* msg) {
             case CAN_CONTROL_FRAME_CID5:
             case CAN_CONTROL_FRAME_CID4:
 
-                printf("CID\n");
-
                 TestForAliasConflict(msg, CAN_CONTROL_FRAME_RID, FALSE);
 
                 break;
@@ -288,7 +286,7 @@ void HandleIncoming_CAN_Control_Frame(can_msg_t* msg) {
                             CopyNodeIDToCANBuffer(&out_msg, nodes.node[iIndex].id);
                             out_msg.identifier = RESERVED_TOP_BIT | CAN_CONTROL_FRAME_AMD | nodes.node[iIndex].alias;
 
-                            Push_CAN_Message(&out_msg, TRUE);
+                            Push_CAN_Frame_Message(&out_msg, TRUE);
 
                         }
                     }
