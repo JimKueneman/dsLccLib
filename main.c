@@ -177,10 +177,10 @@ int main(void) {
 
     openlcb_node_t* node = AllocateNode(0xAA0203040506);
 
-    //     AllocateNode(0xBB0203040506);
-    //     AllocateNode(0xCC0203040506);
-    //     AllocateNode(0xDD0203040506);
-    //     AllocateNode(0xFF0203040506);
+         AllocateNode(0xBB0203040506);
+         AllocateNode(0xCC0203040506);
+         AllocateNode(0xDD0203040506);
+         AllocateNode(0xFF0203040506);
 
     AliasChangeCallbackFunc = &AliasAllocatedCallback;
 

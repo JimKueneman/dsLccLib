@@ -173,11 +173,11 @@ section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x200              0x14ae          0x1f05  (7941)
 .const                      0x16ae               0xe5c          0x158a  (5514)
-.text                       0x250a              0x3c2e          0x5a45  (23109)
-.dinit                      0x6138                0xa4            0xf6  (246)
-.init.delay32               0x61dc                0x1c            0x2a  (42)
+.text                       0x250a              0x3bf8          0x59f4  (23028)
+.dinit                      0x6102                0xa4            0xf6  (246)
+.init.delay32               0x61a6                0x1c            0x2a  (42)
 
-                 Total "program" memory used (bytes):         0x8ff4  (36852) 55%
+                 Total "program" memory used (bytes):         0x8fa3  (36771) 55%
 
 
 "data" Memory  [Origin = 0x1000, Length = 0x2000]
@@ -189,7 +189,7 @@ section                    address      alignment gaps    total length  (dec)
 .data                       0x1142                   0            0x60  (96)
 .bss                        0x11a2                   0            0x18  (24)
 .data                       0x11ba                   0             0x2  (2)
-_0x10ff40140672d5f2e        0x1200                   0           0x200  (512)
+_0x10f736140672d6e19        0x1200                   0           0x200  (512)
 .bss                        0x1400                   0          0x161c  (5660)
 .bss                        0x2a1c                   0            0xf4  (244)
 
@@ -282,8 +282,8 @@ External Symbols in Program Memory (by address):
 
                   0x000200                  __resetPRI
                   0x00023c                  __psv_init
-                  0x000248                  __data_init
                   0x000248                  __data_init_extended
+                  0x000248                  __data_init
                   0x00030a                  __OscillatorFail
                   0x000310                  __AddressError
                   0x000316                  __StackError
@@ -385,65 +385,67 @@ External Symbols in Program Memory (by address):
                   0x00466a                  _HandleProtocolSupportInquiry
                   0x004704                  _HandleVerifyNodeID
                   0x004768                  _DispatchMsg
-                  0x004808                  _RunMainStateMachine
-                  0x004bac                  _Process_OpenLCB_Messages
-                  0x004bc2                  _Allocate_OpenLcb_Msg
-                  0x004d00                  _Insert_OpenLcb_Message
-                  0x004d5a                  _Find_OpenLcb_Message
-                  0x004e0e                  _Push_OpenLcb_Message
-                  0x004e76                  _Pop_OpenLcb_Message
-                  0x004ee0                  _Is_OpenLcb_FIFO_Empty
-                  0x004f18                  _Release_OpenLcb_Msg
-                  0x004f4a                  _Initialize_OpenLcb_Buffers
-                  0x005132                  _Initialize_Node
-                  0x0051e8                  _NextActiveNode
-                  0x005218                  _AllocateNode
-                  0x0052c4                  _FindNodeByAlias
-                  0x005300                  _FindNodeByNodeID
-                  0x005354                  _GenerateNewSeed
-                  0x0054c4                  _GenerateAlias
-                  0x00554a                  __100msTimeTickNode
-                  0x005584                  _Initialize_CAN_Outgoing_StateMachine
-                  0x005590                  _Send_Raw_CAN_Message
-                  0x00561a                  _Outgoing_CAN_Msg_Buffer_Empty
-                  0x005638                  _Load_Outgoing_CAN_Msg_Buffer
-                  0x00565a                  _Outgoing_OpenLcb_Msg_Buffer_Empty
-                  0x005674                  _Load_Outgoing_OpenLcb_Msg_Buffer
-                  0x005694                  _Statemachine_Outgoing_CAN
-                  0x005994                  _CopyNodeIDToMessage
-                  0x0059f2                  _CopyNodeIDToCANBuffer
-                  0x005a46                  _MessageDataToNodeID
-                  0x005b04                  _CAN_PayloadToNodeID
-                  0x005bb6                  _CAN_CopyBuffers
-                  0x005bea                  _EqualBuffers
-                  0x005c40                  _ClearIntrflags
-                  0x005c50                  _HandleTime
-                  0x005c8e                  _HandleUART
-                  0x005cac                  _AliasAllocatedCallback
-                  0x005cc8                  _main
-                  0x005df0                  _CopyData_CAN_Buffer_To_OpenLcbMsg
-                  0x005ee4                  _TestForAliasConflict
-                  0x005f98                  _Process_CAN_Frame_Messages
-                  0x005fb4                  _Initialize_CAN_Frame_Buffers
-                  0x006014                  _Push_CAN_Frame_Message
-                  0x006094                  _Pop_CAN_Frame_Message
-                  0x006104                  _Is_CAN_FIFO_Empty
-                  0x0061dc                  ___delay32
+                  0x00480a                  _RunMainStateMachine
+                  0x004bae                  _Process_OpenLCB_Messages
+                  0x004bc4                  _Allocate_OpenLcb_Msg
+                  0x004d02                  _Insert_OpenLcb_Message
+                  0x004d5c                  _Find_OpenLcb_Message
+                  0x004e10                  _Push_OpenLcb_Message
+                  0x004e78                  _Pop_OpenLcb_Message
+                  0x004ee2                  _Is_OpenLcb_FIFO_Empty
+                  0x004f1a                  _Release_OpenLcb_Msg
+                  0x004f4c                  _Initialize_OpenLcb_Buffers
+                  0x005134                  _Initialize_Node
+                  0x0051ea                  _NextActiveNode
+                  0x00521a                  _AllocateNode
+                  0x0052c6                  _FindNodeByAlias
+                  0x005302                  _FindNodeByNodeID
+                  0x005356                  _GenerateNewSeed
+                  0x0054c6                  _GenerateAlias
+                  0x00554c                  __100msTimeTickNode
+                  0x005586                  _Initialize_CAN_Outgoing_StateMachine
+                  0x005592                  _Outgoing_CAN_Msg_Buffer_Empty
+                  0x0055b0                  _Load_Outgoing_CAN_Msg_Buffer
+                  0x0055d2                  _Outgoing_OpenLcb_Msg_Buffer_Empty
+                  0x0055ec                  _Load_Outgoing_OpenLcb_Msg_Buffer
+                  0x005612                  _HandleDatagram
+                  0x00571e                  _HandleUnaddresedMsg
+                  0x00578e                  _HandleAddressedMsg
+                  0x0058c2                  _Statemachine_Outgoing_CAN
+                  0x005938                  _CopyNodeIDToMessage
+                  0x005996                  _CopyNodeIDToCANBuffer
+                  0x0059ea                  _MessageDataToNodeID
+                  0x005aa8                  _CAN_PayloadToNodeID
+                  0x005b5a                  _CAN_CopyBuffers
+                  0x005b8e                  _EqualBuffers
+                  0x005be4                  _ClearIntrflags
+                  0x005bf4                  _HandleTime
+                  0x005c32                  _HandleUART
+                  0x005c50                  _AliasAllocatedCallback
+                  0x005c6c                  _main
+                  0x005dbc                  _CopyData_CAN_Buffer_To_OpenLcbMsg
+                  0x005eb0                  _TestForAliasConflict
+                  0x005f64                  _Process_CAN_Frame_Messages
+                  0x005f80                  _Initialize_CAN_Frame_Buffers
+                  0x005fe0                  _Push_CAN_Frame_Message
+                  0x006060                  _Pop_CAN_Frame_Message
+                  0x0060ce                  _Is_CAN_FIFO_Empty
+                  0x0061a6                  ___delay32
                   0x00affa                  __FGS.sec
 
 External Symbols in Program Memory (by name):
 
-                  0x005cac                  _AliasAllocatedCallback
+                  0x005c50                  _AliasAllocatedCallback
                   0x003d80                  _AllocateAndStoreToFIFO
                   0x003dea                  _AllocateAndStoreToOpenLcbMsg
-                  0x005218                  _AllocateNode
-                  0x004bc2                  _Allocate_OpenLcb_Msg
-                  0x005bb6                  _CAN_CopyBuffers
-                  0x005b04                  _CAN_PayloadToNodeID
-                  0x005c40                  _ClearIntrflags
-                  0x005df0                  _CopyData_CAN_Buffer_To_OpenLcbMsg
-                  0x0059f2                  _CopyNodeIDToCANBuffer
-                  0x005994                  _CopyNodeIDToMessage
+                  0x00521a                  _AllocateNode
+                  0x004bc4                  _Allocate_OpenLcb_Msg
+                  0x005b5a                  _CAN_CopyBuffers
+                  0x005aa8                  _CAN_PayloadToNodeID
+                  0x005be4                  _ClearIntrflags
+                  0x005dbc                  _CopyData_CAN_Buffer_To_OpenLcbMsg
+                  0x005996                  _CopyNodeIDToCANBuffer
+                  0x005938                  _CopyNodeIDToMessage
                   0x0035a8                  _CountFIFO
                   0x004768                  _DispatchMsg
                   0x003430                  _Ecan1DisableRXFilter
@@ -458,15 +460,17 @@ External Symbols in Program Memory (by name):
                   0x002f8e                  _Ecan1WriteTxMsgBufDataByte
                   0x002e3c                  _Ecan1WriteTxMsgBufDataWord
                   0x002a8a                  _Ecan1WriteTxMsgBufId
-                  0x005bea                  _EqualBuffers
+                  0x005b8e                  _EqualBuffers
                   0x0020d0                  _FIFO_FLAG_MASKS
                   0x0020ce                  _FIFO_RX_START_INDEX
-                  0x0052c4                  _FindNodeByAlias
-                  0x005300                  _FindNodeByNodeID
-                  0x004d5a                  _Find_OpenLcb_Message
+                  0x0052c6                  _FindNodeByAlias
+                  0x005302                  _FindNodeByNodeID
+                  0x004d5c                  _Find_OpenLcb_Message
                   0x003568                  _ForceFlushAndFreeFIFO
-                  0x0054c4                  _GenerateAlias
-                  0x005354                  _GenerateNewSeed
+                  0x0054c6                  _GenerateAlias
+                  0x005356                  _GenerateNewSeed
+                  0x00578e                  _HandleAddressedMsg
+                  0x005612                  _HandleDatagram
                   0x0040d2                  _HandleIncoming_CAN_Control_Frame
                   0x003e54                  _HandleIncoming_CAN_FirstFrame
                   0x003f36                  _HandleIncoming_CAN_LastFrame
@@ -474,27 +478,28 @@ External Symbols in Program Memory (by name):
                   0x003ede                  _HandleIncoming_CAN_MiddleFrame
                   0x00466a                  _HandleProtocolSupportInquiry
                   0x004536                  _HandleSimpleNodeInfoRequest
-                  0x005c50                  _HandleTime
-                  0x005c8e                  _HandleUART
+                  0x005bf4                  _HandleTime
+                  0x005c32                  _HandleUART
+                  0x00571e                  _HandleUnaddresedMsg
                   0x004704                  _HandleVerifyNodeID
-                  0x005fb4                  _Initialize_CAN_Frame_Buffers
+                  0x005f80                  _Initialize_CAN_Frame_Buffers
                   0x003d7a                  _Initialize_CAN_Incoming_StateMachine
-                  0x005584                  _Initialize_CAN_Outgoing_StateMachine
+                  0x005586                  _Initialize_CAN_Outgoing_StateMachine
                   0x00250a                  _Initialize_MCU_Drv
-                  0x005132                  _Initialize_Node
-                  0x004f4a                  _Initialize_OpenLcb_Buffers
+                  0x005134                  _Initialize_Node
+                  0x004f4c                  _Initialize_OpenLcb_Buffers
                   0x004530                  _Initialize_OpenLcb_StateMachine
-                  0x004d00                  _Insert_OpenLcb_Message
-                  0x006104                  _Is_CAN_FIFO_Empty
-                  0x004ee0                  _Is_OpenLcb_FIFO_Empty
-                  0x005638                  _Load_Outgoing_CAN_Msg_Buffer
-                  0x005674                  _Load_Outgoing_OpenLcb_Msg_Buffer
-                  0x005a46                  _MessageDataToNodeID
-                  0x0051e8                  _NextActiveNode
-                  0x00561a                  _Outgoing_CAN_Msg_Buffer_Empty
-                  0x00565a                  _Outgoing_OpenLcb_Msg_Buffer_Empty
-                  0x006094                  _Pop_CAN_Frame_Message
-                  0x004e76                  _Pop_OpenLcb_Message
+                  0x004d02                  _Insert_OpenLcb_Message
+                  0x0060ce                  _Is_CAN_FIFO_Empty
+                  0x004ee2                  _Is_OpenLcb_FIFO_Empty
+                  0x0055b0                  _Load_Outgoing_CAN_Msg_Buffer
+                  0x0055ec                  _Load_Outgoing_OpenLcb_Msg_Buffer
+                  0x0059ea                  _MessageDataToNodeID
+                  0x0051ea                  _NextActiveNode
+                  0x005592                  _Outgoing_CAN_Msg_Buffer_Empty
+                  0x0055d2                  _Outgoing_OpenLcb_Msg_Buffer_Empty
+                  0x006060                  _Pop_CAN_Frame_Message
+                  0x004e78                  _Pop_OpenLcb_Message
                   0x0034bc                  _PrintAliasAndNodeID
                   0x0035da                  _PrintBufferStats
                   0x003960                  _PrintCAN1Registers
@@ -506,18 +511,17 @@ External Symbols in Program Memory (by name):
                   0x003cb6                  _PrintDMA3Registers
                   0x003d24                  _PrintDMACommonRegisters
                   0x00366c                  _PrintMtiName
-                  0x005f98                  _Process_CAN_Frame_Messages
-                  0x004bac                  _Process_OpenLCB_Messages
-                  0x006014                  _Push_CAN_Frame_Message
-                  0x004e0e                  _Push_OpenLcb_Message
-                  0x004f18                  _Release_OpenLcb_Msg
-                  0x004808                  _RunMainStateMachine
-                  0x005590                  _Send_Raw_CAN_Message
+                  0x005f64                  _Process_CAN_Frame_Messages
+                  0x004bae                  _Process_OpenLCB_Messages
+                  0x005fe0                  _Push_CAN_Frame_Message
+                  0x004e10                  _Push_OpenLcb_Message
+                  0x004f1a                  _Release_OpenLcb_Msg
+                  0x00480a                  _RunMainStateMachine
                   0x004274                  _Statemachine_Incoming_CAN
-                  0x005694                  _Statemachine_Outgoing_CAN
-                  0x005ee4                  _TestForAliasConflict
+                  0x0058c2                  _Statemachine_Outgoing_CAN
+                  0x005eb0                  _TestForAliasConflict
                   0x002506                  _USER_DEFINED_PROTOCOL_SUPPORT
-                  0x00554a                  __100msTimeTickNode
+                  0x00554c                  __100msTimeTickNode
                   0x00347c                  __100msTimerEnableInterrupt
                   0x000310                  __AddressError
                   0x000626                  __C1Interrupt
@@ -533,7 +537,7 @@ External Symbols in Program Memory (by name):
                   0x000398                  __U1RXInterrupt
                   0x000390                  __U1TXInterrupt
                   0x000964                  ___cvt_u
-                  0x0061dc                  ___delay32
+                  0x0061a6                  ___delay32
                   0x0015f2                  ___divdi3
                   0x001432                  ___extendsfdf2
                   0x0007e6                  ___fmt_d
@@ -574,7 +578,7 @@ External Symbols in Program Memory (by name):
                   0x0011c8                  _atoi
                   0x001214                  _fputs
                   0x001240                  _fwrite
-                  0x005cc8                  _main
+                  0x005c6c                  _main
                   0x001278                  _memcpy
                   0x001286                  _memset
                   0x00137c                  _putc
@@ -876,7 +880,7 @@ __FOSCSEL
 
 __FGS             0x00affa          0x2
  *(__FGS.sec*)
- __FGS.sec        0x00affa          0x2 /CW/_FGSX
+ __FGS.sec        0x00affa          0x2 /CW/_FGSXÀ»vñ
                   0x00affa                  __FGS.sec
 
 __FUID0
@@ -894,7 +898,7 @@ __FUID3
 .comment
  *(.comment)
 
-.debug_info       0x000000       0x9ad3
+.debug_info       0x000000       0x9ac4
  *(.debug_info)
  .debug_info      0x000000        0xe62 build/default/production/main.o
  .debug_info      0x000e62        0x344 build/default/production/traps.o
@@ -906,12 +910,12 @@ __FUID3
  .debug_info      0x003a04        0x7f4 build/default/production/openlcb_statemachine.o
  .debug_info      0x0041f8       0x3954 build/default/production/mcu_driver.o
  .debug_info      0x007b4c        0x461 build/default/production/can_buffers.o
- .debug_info      0x007fad        0x666 build/default/production/can_outgoing_statemachine.o
- .debug_info      0x008613        0x714 build/default/production/can_common_statemachine.o
- .debug_info      0x008d27        0xc03 build/default/production/can_incoming_statemachine.o
- .debug_info      0x00992a         0x90 /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(extendsfdf.EP_o)
- .debug_info      0x0099ba         0x8d /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(funpack.EP_o)
- .debug_info      0x009a47         0x8c /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(mulsi3.EP_o)
+ .debug_info      0x007fad        0x657 build/default/production/can_outgoing_statemachine.o
+ .debug_info      0x008604        0x714 build/default/production/can_common_statemachine.o
+ .debug_info      0x008d18        0xc03 build/default/production/can_incoming_statemachine.o
+ .debug_info      0x00991b         0x90 /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(extendsfdf.EP_o)
+ .debug_info      0x0099ab         0x8d /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(funpack.EP_o)
+ .debug_info      0x009a38         0x8c /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(mulsi3.EP_o)
  *(.gnu.linkonce.wi.*)
 
 .debug_abbrev     0x000000       0x1149
@@ -933,26 +937,26 @@ __FUID3
  .debug_abbrev    0x001121         0x14 /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(funpack.EP_o)
  .debug_abbrev    0x001135         0x14 /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(mulsi3.EP_o)
 
-.debug_line       0x000000       0x141e
+.debug_line       0x000000       0x140c
  *(.debug_line)
- .debug_line      0x000000        0x1c0 build/default/production/main.o
- .debug_line      0x0001c0        0x121 build/default/production/traps.o
- .debug_line      0x0002e1        0x23c build/default/production/debug.o
- .debug_line      0x00051d         0xf8 build/default/production/node.o
- .debug_line      0x000615         0xf7 build/default/production/openlcb_utilities.o
- .debug_line      0x00070c         0x84 build/default/production/callbacks.o
- .debug_line      0x000790        0x169 build/default/production/openlcb_buffers.o
- .debug_line      0x0008f9        0x1af build/default/production/openlcb_statemachine.o
- .debug_line      0x000aa8        0x39e build/default/production/mcu_driver.o
- .debug_line      0x000e46         0xd9 build/default/production/can_buffers.o
- .debug_line      0x000f1f        0x160 build/default/production/can_outgoing_statemachine.o
- .debug_line      0x00107f        0x102 build/default/production/can_common_statemachine.o
- .debug_line      0x001181        0x1c0 build/default/production/can_incoming_statemachine.o
- .debug_line      0x001341         0x59 /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(extendsfdf.EP_o)
- .debug_line      0x00139a         0x4a /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(funpack.EP_o)
- .debug_line      0x0013e4         0x3a /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(mulsi3.EP_o)
+ .debug_line      0x000000        0x1c4 build/default/production/main.o
+ .debug_line      0x0001c4        0x121 build/default/production/traps.o
+ .debug_line      0x0002e5        0x23c build/default/production/debug.o
+ .debug_line      0x000521         0xf8 build/default/production/node.o
+ .debug_line      0x000619         0xf7 build/default/production/openlcb_utilities.o
+ .debug_line      0x000710         0x84 build/default/production/callbacks.o
+ .debug_line      0x000794        0x169 build/default/production/openlcb_buffers.o
+ .debug_line      0x0008fd        0x1b4 build/default/production/openlcb_statemachine.o
+ .debug_line      0x000ab1        0x39e build/default/production/mcu_driver.o
+ .debug_line      0x000e4f         0xd9 build/default/production/can_buffers.o
+ .debug_line      0x000f28        0x145 build/default/production/can_outgoing_statemachine.o
+ .debug_line      0x00106d        0x102 build/default/production/can_common_statemachine.o
+ .debug_line      0x00116f        0x1c0 build/default/production/can_incoming_statemachine.o
+ .debug_line      0x00132f         0x59 /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(extendsfdf.EP_o)
+ .debug_line      0x001388         0x4a /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(funpack.EP_o)
+ .debug_line      0x0013d2         0x3a /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(mulsi3.EP_o)
 
-.debug_frame      0x000000        0xdc0
+.debug_frame      0x000000        0xdea
  *(.debug_frame)
  .debug_frame     0x000000         0xb2 build/default/production/main.o
  .debug_frame     0x0000b2         0x96 build/default/production/traps.o
@@ -963,11 +967,11 @@ __FUID3
  .debug_frame     0x000654        0x112 build/default/production/openlcb_statemachine.o
  .debug_frame     0x000766        0x2fe build/default/production/mcu_driver.o
  .debug_frame     0x000a64         0x96 build/default/production/can_buffers.o
- .debug_frame     0x000afa         0xd4 build/default/production/can_outgoing_statemachine.o
- .debug_frame     0x000bce         0x50 build/default/production/can_common_statemachine.o
- .debug_frame     0x000c1e        0x1a2 build/default/production/can_incoming_statemachine.o
+ .debug_frame     0x000afa         0xfe build/default/production/can_outgoing_statemachine.o
+ .debug_frame     0x000bf8         0x50 build/default/production/can_common_statemachine.o
+ .debug_frame     0x000c48        0x1a2 build/default/production/can_incoming_statemachine.o
 
-.debug_str        0x000000        0x93e
+.debug_str        0x000000        0x92d
  *(.debug_str)
  .debug_str       0x000000         0x81 build/default/production/main.o
  .debug_str       0x000081          0xc build/default/production/traps.o
@@ -978,9 +982,9 @@ __FUID3
  .debug_str       0x000441         0x7a build/default/production/openlcb_statemachine.o
  .debug_str       0x0004bb        0x2c4 build/default/production/mcu_driver.o
  .debug_str       0x00077f         0x74 build/default/production/can_buffers.o
- .debug_str       0x0007f3         0x8b build/default/production/can_outgoing_statemachine.o
- .debug_str       0x00087e          0xa build/default/production/can_common_statemachine.o
- .debug_str       0x000888         0xb6 build/default/production/can_incoming_statemachine.o
+ .debug_str       0x0007f3         0x7a build/default/production/can_outgoing_statemachine.o
+ .debug_str       0x00086d          0xa build/default/production/can_common_statemachine.o
+ .debug_str       0x000877         0xb6 build/default/production/can_incoming_statemachine.o
 
 .debug_loc
  *(.debug_loc)
@@ -989,7 +993,7 @@ __FUID3
  *(.debug_macinfo)
 
 .debug_pubnames
-                  0x000000        0xd3d
+                  0x000000        0xd66
  *(.debug_pubnames)
  .debug_pubnames
                   0x000000         0x67 build/default/production/main.o
@@ -1012,11 +1016,11 @@ __FUID3
  .debug_pubnames
                   0x000920        0x107 build/default/production/can_buffers.o
  .debug_pubnames
-                  0x000a27        0x183 build/default/production/can_outgoing_statemachine.o
+                  0x000a27        0x1ac build/default/production/can_outgoing_statemachine.o
  .debug_pubnames
-                  0x000baa         0x51 build/default/production/can_common_statemachine.o
+                  0x000bd3         0x51 build/default/production/can_common_statemachine.o
  .debug_pubnames
-                  0x000bfb        0x142 build/default/production/can_incoming_statemachine.o
+                  0x000c24        0x142 build/default/production/can_incoming_statemachine.o
 
 .debug_ranges
  *(.debug_ranges)
@@ -2156,7 +2160,7 @@ LOAD /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libm-elf.a
 LOAD /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-elf.a
 END GROUP
 OUTPUT(dist/default/production/dsLccLib.production.elf elf32-pic30)
-LOAD /CW/_FGSX
+LOAD /CW/_FGSXÀ»vñ
 LOAD jump_table
 LOAD default_isr
 LOAD data_init
@@ -2328,9 +2332,9 @@ __xc_reference_data
  .nbss              0x1018          0x2 build/default/production/callbacks.o
                     0x1018                  _AliasChangeCallbackFunc
 
-_0x10ff40140672d5f2e
+_0x10f736140672d6e19
                     0x1200        0x200
- _0x10ff40140672d5f2e
+ _0x10f736140672d6e19
                     0x1200        0x200 build/default/production/mcu_driver.o
                     0x1200                  _ecan1msgBuf
 
@@ -2453,7 +2457,7 @@ _0x10ff40140672d5f2e
  .const             0xa506          0x4 build/default/production/openlcb_statemachine.o
                     0xa506                  _USER_DEFINED_PROTOCOL_SUPPORT
 
-.text             0x00250a       0x3c2e
+.text             0x00250a       0x3bf8
  .text            0x00250a        0xf8c build/default/production/mcu_driver.o
                   0x00250a                  _Initialize_MCU_Drv
                   0x00268c                  _Ecan1WriteRxAcptFilter
@@ -2493,66 +2497,68 @@ _0x10ff40140672d5f2e
                   0x003fa4                  _HandleIncoming_CAN_LegacySNIP
                   0x0040d2                  _HandleIncoming_CAN_Control_Frame
                   0x004274                  _Statemachine_Incoming_CAN
- .text            0x004530        0x67c build/default/production/openlcb_statemachine.o
+ .text            0x004530        0x67e build/default/production/openlcb_statemachine.o
                   0x004530                  _Initialize_OpenLcb_StateMachine
                   0x004536                  _HandleSimpleNodeInfoRequest
                   0x00466a                  _HandleProtocolSupportInquiry
                   0x004704                  _HandleVerifyNodeID
                   0x004768                  _DispatchMsg
-                  0x004808                  _RunMainStateMachine
- .text            0x004bac        0x586 build/default/production/openlcb_buffers.o
-                  0x004bac                  _Process_OpenLCB_Messages
-                  0x004bc2                  _Allocate_OpenLcb_Msg
-                  0x004d00                  _Insert_OpenLcb_Message
-                  0x004d5a                  _Find_OpenLcb_Message
-                  0x004e0e                  _Push_OpenLcb_Message
-                  0x004e76                  _Pop_OpenLcb_Message
-                  0x004ee0                  _Is_OpenLcb_FIFO_Empty
-                  0x004f18                  _Release_OpenLcb_Msg
-                  0x004f4a                  _Initialize_OpenLcb_Buffers
- .text            0x005132        0x452 build/default/production/node.o
-                  0x005132                  _Initialize_Node
-                  0x0051e8                  _NextActiveNode
-                  0x005218                  _AllocateNode
-                  0x0052c4                  _FindNodeByAlias
-                  0x005300                  _FindNodeByNodeID
-                  0x005354                  _GenerateNewSeed
-                  0x0054c4                  _GenerateAlias
-                  0x00554a                  __100msTimeTickNode
- .text            0x005584        0x410 build/default/production/can_outgoing_statemachine.o
-                  0x005584                  _Initialize_CAN_Outgoing_StateMachine
-                  0x005590                  _Send_Raw_CAN_Message
-                  0x00561a                  _Outgoing_CAN_Msg_Buffer_Empty
-                  0x005638                  _Load_Outgoing_CAN_Msg_Buffer
-                  0x00565a                  _Outgoing_OpenLcb_Msg_Buffer_Empty
-                  0x005674                  _Load_Outgoing_OpenLcb_Msg_Buffer
-                  0x005694                  _Statemachine_Outgoing_CAN
- .text            0x005994        0x2ac build/default/production/openlcb_utilities.o
-                  0x005994                  _CopyNodeIDToMessage
-                  0x0059f2                  _CopyNodeIDToCANBuffer
-                  0x005a46                  _MessageDataToNodeID
-                  0x005b04                  _CAN_PayloadToNodeID
-                  0x005bb6                  _CAN_CopyBuffers
-                  0x005bea                  _EqualBuffers
- .text            0x005c40        0x1b0 build/default/production/main.o
-                  0x005c40                  _ClearIntrflags
-                  0x005c50                  _HandleTime
-                  0x005c8e                  _HandleUART
-                  0x005cac                  _AliasAllocatedCallback
-                  0x005cc8                  _main
- .text            0x005df0        0x1a8 build/default/production/can_common_statemachine.o
-                  0x005df0                  _CopyData_CAN_Buffer_To_OpenLcbMsg
-                  0x005ee4                  _TestForAliasConflict
- .text            0x005f98        0x1a0 build/default/production/can_buffers.o
-                  0x005f98                  _Process_CAN_Frame_Messages
-                  0x005fb4                  _Initialize_CAN_Frame_Buffers
-                  0x006014                  _Push_CAN_Frame_Message
-                  0x006094                  _Pop_CAN_Frame_Message
-                  0x006104                  _Is_CAN_FIFO_Empty
+                  0x00480a                  _RunMainStateMachine
+ .text            0x004bae        0x586 build/default/production/openlcb_buffers.o
+                  0x004bae                  _Process_OpenLCB_Messages
+                  0x004bc4                  _Allocate_OpenLcb_Msg
+                  0x004d02                  _Insert_OpenLcb_Message
+                  0x004d5c                  _Find_OpenLcb_Message
+                  0x004e10                  _Push_OpenLcb_Message
+                  0x004e78                  _Pop_OpenLcb_Message
+                  0x004ee2                  _Is_OpenLcb_FIFO_Empty
+                  0x004f1a                  _Release_OpenLcb_Msg
+                  0x004f4c                  _Initialize_OpenLcb_Buffers
+ .text            0x005134        0x452 build/default/production/node.o
+                  0x005134                  _Initialize_Node
+                  0x0051ea                  _NextActiveNode
+                  0x00521a                  _AllocateNode
+                  0x0052c6                  _FindNodeByAlias
+                  0x005302                  _FindNodeByNodeID
+                  0x005356                  _GenerateNewSeed
+                  0x0054c6                  _GenerateAlias
+                  0x00554c                  __100msTimeTickNode
+ .text            0x005586        0x3b2 build/default/production/can_outgoing_statemachine.o
+                  0x005586                  _Initialize_CAN_Outgoing_StateMachine
+                  0x005592                  _Outgoing_CAN_Msg_Buffer_Empty
+                  0x0055b0                  _Load_Outgoing_CAN_Msg_Buffer
+                  0x0055d2                  _Outgoing_OpenLcb_Msg_Buffer_Empty
+                  0x0055ec                  _Load_Outgoing_OpenLcb_Msg_Buffer
+                  0x005612                  _HandleDatagram
+                  0x00571e                  _HandleUnaddresedMsg
+                  0x00578e                  _HandleAddressedMsg
+                  0x0058c2                  _Statemachine_Outgoing_CAN
+ .text            0x005938        0x2ac build/default/production/openlcb_utilities.o
+                  0x005938                  _CopyNodeIDToMessage
+                  0x005996                  _CopyNodeIDToCANBuffer
+                  0x0059ea                  _MessageDataToNodeID
+                  0x005aa8                  _CAN_PayloadToNodeID
+                  0x005b5a                  _CAN_CopyBuffers
+                  0x005b8e                  _EqualBuffers
+ .text            0x005be4        0x1d8 build/default/production/main.o
+                  0x005be4                  _ClearIntrflags
+                  0x005bf4                  _HandleTime
+                  0x005c32                  _HandleUART
+                  0x005c50                  _AliasAllocatedCallback
+                  0x005c6c                  _main
+ .text            0x005dbc        0x1a8 build/default/production/can_common_statemachine.o
+                  0x005dbc                  _CopyData_CAN_Buffer_To_OpenLcbMsg
+                  0x005eb0                  _TestForAliasConflict
+ .text            0x005f64        0x19e build/default/production/can_buffers.o
+                  0x005f64                  _Process_CAN_Frame_Messages
+                  0x005f80                  _Initialize_CAN_Frame_Buffers
+                  0x005fe0                  _Push_CAN_Frame_Message
+                  0x006060                  _Pop_CAN_Frame_Message
+                  0x0060ce                  _Is_CAN_FIFO_Empty
 
-.dinit            0x006138         0xa4
- .dinit           0x006138         0xa4 data_init
+.dinit            0x006102         0xa4
+ .dinit           0x006102         0xa4 data_init
 
-.init.delay32     0x0061dc         0x1c
- .init.delay32    0x0061dc         0x1c /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(delay32ep.Meo)
-                  0x0061dc                  ___delay32
+.init.delay32     0x0061a6         0x1c
+ .init.delay32    0x0061a6         0x1c /Applications/microchip/xc16/v2.10/bin/bin/../../lib/libc99-pic30-elf.a(delay32ep.Meo)
+                  0x0061a6                  ___delay32

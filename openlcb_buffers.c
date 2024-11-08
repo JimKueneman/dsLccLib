@@ -38,10 +38,12 @@ uint16_t max_pool_openlcb_msg_allocated = 0;
 
 void Process_OpenLCB_Messages() {
     
-    if (Outgoing_OpenLcb_Msg_Buffer_Empty()) 
+    if (Outgoing_OpenLcb_Msg_Buffer_Empty()) {
         
         Load_Outgoing_OpenLcb_Msg_Buffer(Pop_OpenLcb_Message(&outgoing_openlcb_msg_fifo, TRUE));
         
+    }    
+    
     // Pump the message engine 
     Statemachine_Outgoing_CAN();
     

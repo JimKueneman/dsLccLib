@@ -110,7 +110,8 @@ uint8_t Pop_CAN_Frame_Message(can_msg_t* msg, uint8_t disable_interrupts) {
             *msg = outgoing_can_fifo.list[outgoing_can_fifo.tail];
 
             outgoing_can_fifo.tail = outgoing_can_fifo.tail + 1;
-            if (outgoing_can_fifo.tail >= LEN_OPENLCB_MSG_FIFO)
+            
+            if (outgoing_can_fifo.tail >= LEN_CAN_PAYLOAD_DATA)
                 outgoing_can_fifo.tail = 0;
 
             pool_can_msg_allocated = pool_can_msg_allocated - 1;

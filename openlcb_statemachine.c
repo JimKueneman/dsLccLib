@@ -22,7 +22,7 @@
 
 void Initialize_OpenLcb_StateMachine(void) {
 
-   
+
 
 }
 
@@ -63,9 +63,8 @@ void HandleSimpleNodeInfoRequest(openlcb_msg_t* dispatched_msg, openlcb_node_t* 
             (*(payload_stream_snip_t*) (new_msg->payload_ptr))[24] = 0x00;
             (*(payload_stream_snip_t*) (new_msg->payload_ptr))[25] = 0x00;
 
-            new_msg->payload_count = 26;
-
-
+            new_msg->payload_count = 26;     
+                    
             if (!Push_OpenLcb_Message(&outgoing_openlcb_msg_fifo, new_msg, TRUE)) {
 
                 // TODO: Send Error
@@ -133,9 +132,9 @@ void HandleVerifyNodeID(openlcb_msg_t* dispatched_msg, openlcb_node_t* node) {
 
 
     } else {
-        
+
         // TODO: Send Error
-        
+
     }
 
 }
@@ -146,56 +145,55 @@ void DispatchMsg(openlcb_msg_t* dispatched_msg) {
     openlcb_node_t* firstnode;
 
 
-    if (dispatched_msg) {
+    if (!dispatched_msg)
+        return;
 
-        nextnode = NextActiveNode();
-        firstnode = nextnode;
+    nextnode = NextActiveNode();
+    firstnode = nextnode;
 
-        if (nextnode) {
+    if (nextnode) {
 
-            if (nextnode->state.permitted) {
+        if (nextnode->state.permitted) {
 
-                switch (dispatched_msg->mti) {
+            switch (dispatched_msg->mti) {
 
-                    case MTI_SIMPLE_NODE_INFO_REQUEST:
-                    {
-                        HandleSimpleNodeInfoRequest(dispatched_msg, nextnode);
-                        break;
-
-                    }
-                    case MTI_PROTOCOL_SUPPORT_INQUIRY:
-                    {
-                        HandleProtocolSupportInquiry(dispatched_msg, nextnode);
-                        break;
-
-                    }
-                    case MTI_VERIFY_NODE_ID_ADDRESSED:
-                    {
-                        HandleVerifyNodeID(dispatched_msg, nextnode); // Always reply regardless
-                        break;
-                    }
-                    case MTI_VERIFY_NODE_ID_GLOBAL:
-                    {
-                        if (dispatched_msg->payload_count == 6) {
-                            
-                            if (MessageDataToNodeID(dispatched_msg) == nextnode->id)
-                                HandleVerifyNodeID(dispatched_msg, nextnode);
-
-                        } else
-                            HandleVerifyNodeID(dispatched_msg, nextnode);
-
-                        break;
-                    }
+                case MTI_SIMPLE_NODE_INFO_REQUEST:
+                {
+                    HandleSimpleNodeInfoRequest(dispatched_msg, nextnode);
+                    break;
 
                 }
+                case MTI_PROTOCOL_SUPPORT_INQUIRY:
+                {
+                    HandleProtocolSupportInquiry(dispatched_msg, nextnode);
+                    break;
 
+                }
+                case MTI_VERIFY_NODE_ID_ADDRESSED:
+                {
+                    HandleVerifyNodeID(dispatched_msg, nextnode); // Always reply regardless
+                    break;
+                }
+                case MTI_VERIFY_NODE_ID_GLOBAL:
+                {
+                    if (dispatched_msg->payload_count == 6) {
 
-                nextnode = NextActiveNode();
+                        if (MessageDataToNodeID(dispatched_msg) == nextnode->id)
+                            HandleVerifyNodeID(dispatched_msg, nextnode);
 
-                if (nextnode == firstnode)
-                    return;
+                    } else
+                        HandleVerifyNodeID(dispatched_msg, nextnode);
+
+                    break;
+                }
+
             }
 
+
+            nextnode = NextActiveNode();
+
+            if (nextnode == firstnode)
+                return;
         }
 
     }
@@ -210,6 +208,7 @@ void RunMainStateMachine(openlcb_msg_t* dispatched_msg) {
 
 
     DispatchMsg(dispatched_msg);
+
 
     nextnode = NextActiveNode();
 
@@ -235,9 +234,9 @@ void RunMainStateMachine(openlcb_msg_t* dispatched_msg) {
             case RUNSTATE_GENERATE_ALIAS:
 
                 nextnode->alias = GenerateAlias(nextnode->seed);
-               if (AliasChangeCallbackFunc) 
+                if (AliasChangeCallbackFunc)
                     AliasChangeCallbackFunc(nextnode->alias, nextnode->id);
-                
+
                 nextnode->state.run = RUNSTATE_SEND_CHECK_ID_07;
 
                 break;
@@ -246,7 +245,7 @@ void RunMainStateMachine(openlcb_msg_t* dispatched_msg) {
 
                 can_msg.payload_size = 0;
                 can_msg.identifier = RESERVED_TOP_BIT | CAN_CONTROL_FRAME_CID7 | (((nextnode->id >> 24) & 0xFFF000) | nextnode->alias); // AA0203040506
-                  
+
                 if (Push_CAN_Frame_Message(&can_msg, TRUE))
                     nextnode->state.run = RUNSTATE_SEND_CHECK_ID_06;
 
@@ -336,7 +335,7 @@ void RunMainStateMachine(openlcb_msg_t* dispatched_msg) {
                 if (openlcb_msg) {
 
                     CopyNodeIDToMessage(openlcb_msg, nextnode->id);
-                    
+
                     Push_OpenLcb_Message(&outgoing_openlcb_msg_fifo, openlcb_msg, TRUE);
 
                     nextnode->state.run = RUNSTATE_TRANSMIT_EVENTS;
